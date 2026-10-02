@@ -8,7 +8,7 @@ require_relative "lib/logger"
 
 # Only the app's own constants are unloaded; gems required from reloadable
 # files would otherwise be attributed to them and torn down on reload.
-RELOADABLE = %w[Roda Sequel::Model TopicMatch TopicRegistry Sampling Store Differ Presence].freeze
+RELOADABLE = %w[Roda Sequel::Model TopicMatch TopicRegistry Sampling Store Differ Presence SettingsValidator SseStream].freeze
 Unreloader = Rack::Unreloader.new(subclasses: RELOADABLE, reload: dev, logger: ($log if dev)) { App }
 Unreloader.require(File.expand_path("app.rb", __dir__)) { "App" }
 

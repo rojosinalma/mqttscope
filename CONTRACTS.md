@@ -26,13 +26,21 @@ Timestamps are Integer **milliseconds since epoch** (`ts_ms`). Payloads are `Str
 | `prune_batch` | `5000` | rows per delete batch |
 | `max_topics` | `20000` | in-memory registry cap (LRU evict) |
 | `rate_window_s` | `60` | window for msgs/s |
-| `sse_max_clients` | `20` | |
+| `sse_max_clients` | `12` | must stay below Puma max threads (16) — each stream holds one |
 | `sse_idle_timeout_s` | `300` | close a stream idle this long (no events, heartbeats don't count) |
 | `sse_heartbeat_s` | `15` | `: ping` comment interval |
 | `sse_queue_size` | `500` | per-client queue; overflow drops oldest and emits `{type:"dropped",n}` |
 | `presence_rules` | JSON `[{"name":"esp32","pattern":"esp32/+/status","id_segment":1,"online_path":"online","label_path":"hostname","stale_s":90}]` | |
 | `history_default_limit` | `200` | |
 | `search_default_limit` | `100` | |
+| `series_max_rows` | `50000` | rows scanned per `Store.series` call |
+| `search_max_rows` | `20000` | rows scanned when a wildcard topic filter is applied in Ruby |
+| `api_max_limit` | `5000` | cap on `limit` / `max_points` query params |
+| `series_default_points` | `500` | default `max_points` |
+| `timeline_max_rows` | `5000` | history rows read per device timeline |
+| `diff_max_lines` | `2000` | longest text section line-diffed; larger → summary only |
+| `ingest_max_backlog` | `10000` | if the MQTT client's read queue exceeds this, queued messages are acked and dropped (warned) |
+| `publish_echo_ttl_s` | `10` | how long a UI publish is remembered to tag its echo `origin: ui` |
 
 Settings are read at use time (no caching beyond a request), so edits apply immediately except
 connection params (`Ingest.reconnect!` after saving those).
@@ -79,7 +87,9 @@ Ingest.publish(topic:, payload:, retain: false, qos: 0)  # raises Ingest::NotCon
 Per received packet, in order: `TopicRegistry.touch(...)` → `Sampling.store?(...)` → if true
 `Store.record(...)` → `Bus.publish(message event)` (always, stored or not; `stored:` says which).
 Received `$SYS/#` goes through the same path (sampling rule caps it). Emits `topic` events for
-first-seen topics and `connection` events on state change.
+first-seen topics and `connection` events on state change. Subscriptions are QoS 1; QoS 2 publish is
+refused (ruby-mqtt has no QoS 2 handshake). UI-origin messages are always stored. On a dedup hit
+(`Sampling.last_reason(topic) == :dup`) `Store.bump_dup` is called instead of `record`.
 
 ## TopicRegistry (`lib/topic_registry.rb`, owner A) — reloadable
 
@@ -153,7 +163,10 @@ Presence.timeline(id:, from_ms:, to_ms:) # from Store.history: [{from_ms:, to_ms
 ```
 
 `online` = `online_path` truthy in the last payload **and** `now - last_seen_ms <= stale_s*1000`.
-An LWT payload `{"online":false}` sets offline. `id` = topic segment `id_segment`.
+An LWT payload `{"online":false}` sets offline. `id` = topic segment `id_segment`. Non-JSON payloads
+use the whole payload as the flag (`true 1 online on yes up connected` → online). `stale` = payload says
+online but silent longer than `stale_s`. Timelines treat silence longer than `stale_s` as offline.
+A bare JSON scalar flattens to path `""` (root) — `Store.series` must accept `path: ""`.
 
 ## HTTP API (`routes/api.rb`, owner D). All responses `{ok:, message:, ...}`; errors `json_err` with 4xx/5xx.
 
@@ -162,7 +175,7 @@ GET  /api/topics                                  -> {topics: [registry entries 
 GET  /api/messages?topic=&from_ms=&to_ms=&limit=&before_id=   -> {messages: [...]}   (topic required, exact)
 GET  /api/messages/:id                            -> {message:}
 GET  /api/diff?id=                                -> {diff:, from: message|nil, to: message}   (vs Store.previous)
-GET  /api/series?topic=&path=&from_ms=&to_ms=&max_points=    -> {points: [[ts_ms, v], ...]}
+GET  /api/series?topic=&path=&from_ms=&to_ms=&max_points=    -> {points: [[ts_ms, v], ...]}   (path optional; "" or "." = the payload itself)
 GET  /api/paths?topic=                            -> {paths: Differ.numeric_paths(last payload)}
 GET  /api/search?q=&topic=&from_ms=&to_ms=&limit= -> {results: [...]}
 GET  /api/stats                                   -> {ingest:, db:, sys: Store.sys_latest, sse_clients:, prune: Pruner.last_run}

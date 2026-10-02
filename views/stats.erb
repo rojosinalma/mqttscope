@@ -1,0 +1,58 @@
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+  <h4 class="page-title mb-0"><i class="bi bi-speedometer2 me-2"></i>Stats</h4>
+  <span id="stats-updated" class="small text-muted"></span>
+</div>
+
+<div class="stats-grid mb-4">
+  <div class="card">
+    <div class="card-header d-flex align-items-center gap-2">
+      <h6 class="mb-0"><i class="bi bi-box-arrow-in-down me-2"></i>Ingest</h6>
+      <span id="ingest-badge" class="ms-auto"></span>
+    </div>
+    <div class="card-body">
+      <dl id="ingest-kv" class="kv"></dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex align-items-center gap-2">
+      <h6 class="mb-0"><i class="bi bi-database me-2"></i>Database</h6>
+      <span id="db-governing" class="ms-auto"></span>
+      <button id="prune-btn" class="btn btn-sm btn-outline-warning" type="button"><i class="bi bi-scissors me-1"></i>Prune now</button>
+    </div>
+    <div class="card-body">
+      <div class="d-flex justify-content-between small mb-1">
+        <span id="db-size-label" class="stat-value">—</span>
+        <span id="db-size-pct" class="stat-sub"></span>
+      </div>
+      <div class="progress progress-thin mb-3" role="progressbar" aria-label="Database size">
+        <div id="db-size-bar" class="progress-bar"></div>
+      </div>
+      <dl id="db-kv" class="kv"></dl>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">Broker <span class="text-muted fw-normal text-lowercase">$SYS</span></div>
+<div id="sys-empty" class="d-none"></div>
+<div id="sys-groups" class="stats-grid stats-grid-dense mb-4"></div>
+
+<div id="sparks-section">
+  <div class="section-label">Last 24 hours</div>
+  <div id="sparks" class="spark-grid mb-4"></div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex align-items-center">
+    <button id="sys-all-toggle" class="collapse-toggle" type="button" aria-expanded="false">
+      <i class="bi bi-chevron-right"></i><h6 class="mb-0">All $SYS topics</h6>
+    </button>
+    <span id="sys-all-count" class="ms-auto small text-muted"></span>
+  </div>
+  <div id="sys-all" class="d-none">
+    <table class="table table-sm table-hover mb-0 data-table">
+      <thead><tr><th>Topic</th><th class="text-end">Value</th></tr></thead>
+      <tbody id="sys-all-body"></tbody>
+    </table>
+  </div>
+</div>

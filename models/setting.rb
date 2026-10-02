@@ -36,13 +36,21 @@ class Setting < Sequel::Model(:settings)
       "prune_batch" => "5000",
       "max_topics" => "20000",
       "rate_window_s" => "60",
-      "sse_max_clients" => "20",
+      "sse_max_clients" => "12",
       "sse_idle_timeout_s" => "300",
       "sse_heartbeat_s" => "15",
       "sse_queue_size" => "500",
       "presence_rules" => JSON.generate(DEFAULT_PRESENCE_RULES),
       "history_default_limit" => "200",
-      "search_default_limit" => "100"
+      "search_default_limit" => "100",
+      "series_max_rows" => "50000",
+      "search_max_rows" => "20000",
+      "api_max_limit" => "5000",
+      "series_default_points" => "500",
+      "timeline_max_rows" => "5000",
+      "diff_max_lines" => "2000",
+      "ingest_max_backlog" => "10000",
+      "publish_echo_ttl_s" => "10"
     }
   end
 
