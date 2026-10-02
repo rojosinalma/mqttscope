@@ -1,0 +1,18 @@
+---
+services:
+  mqttscope:
+    container_name: mqttscope
+    restart: unless-stopped
+    networks:
+    - default
+    - traefik-proxy
+    build: "."
+    environment:
+    - RACK_ENV=development
+    - PORT=9292
+    volumes:
+    - "/home/rojo/dev/mqttscope:/app"
+networks:
+  default: {}
+  traefik-proxy:
+    external: true
