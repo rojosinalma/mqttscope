@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Smoke contract for mqttscope. Runs inside the container (docker exec mqttscope /app/bin/verify)
+# or on the host with BASE pointing at the service. Exit non-zero on any failure.
+set -euo pipefail
+
+BASE="${BASE:-http://localhost:${PORT:-9292}}"
+fail() { echo "FAIL: $*" >&2; exit 1; }
+json() { curl -fsS -m 10 "$BASE$1"; }
+
+stats=$(json /api/stats) || fail "/api/stats unreachable"
+echo "$stats" | grep -q '"ok":true' || fail "/api/stats not ok: $stats"
+echo "$stats" | grep -q '"connected":true' || fail "broker not connected: $stats"
+
+topics=$(json /api/topics) || fail "/api/topics unreachable"
+echo "$topics" | grep -q '"ok":true' || fail "/api/topics not ok"
+
+# One SSE event within 20 s proves ingest → Bus → stream end to end.
+if ! curl -sS -N -m 20 "$BASE/api/stream?topics=%23" | grep -q -m1 '^event: '; then
+  fail "no SSE event within 20 s"
+fi
+
+curl -fsS -m 10 -o /dev/null "$BASE/" || fail "GET / failed"
+echo "OK"
