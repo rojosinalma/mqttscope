@@ -15,7 +15,8 @@ topics=$(json /api/topics) || fail "/api/topics unreachable"
 echo "$topics" | grep -q '"ok":true' || fail "/api/topics not ok"
 
 # One SSE event within 20 s proves ingest → Bus → stream end to end.
-if ! curl -sS -N -m 20 "$BASE/api/stream?topics=%23" | grep -q -m1 '^event: '; then
+# curl is killed by grep's early exit (23) under pipefail, so its status is ignored.
+if ! { curl -sS -N -m 20 "$BASE/api/stream?topics=%23" 2>/dev/null || true; } | grep -q -m1 '^event: '; then
   fail "no SSE event within 20 s"
 fi
 

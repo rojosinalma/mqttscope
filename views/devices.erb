@@ -1,0 +1,57 @@
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+  <h4 class="page-title mb-0"><i class="bi bi-cpu me-2"></i>Devices</h4>
+  <div class="d-flex align-items-center gap-2">
+    <div class="input-group input-group-sm device-filter">
+      <span class="input-group-text"><i class="bi bi-funnel"></i></span>
+      <input id="device-filter" data-hotkey="/" class="form-control" type="search" placeholder="Filter devices" aria-label="Filter devices">
+    </div>
+    <span id="device-count" class="small text-muted text-nowrap"></span>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div id="devices-empty" class="d-none"></div>
+  <div id="devices-wrap" class="table-responsive d-none">
+    <table class="table table-hover mb-0 data-table devices-table">
+      <thead>
+        <tr>
+          <th class="col-icon"></th>
+          <th>Device</th>
+          <th>ID</th>
+          <th>Rule</th>
+          <th>Last seen</th>
+          <th>Since</th>
+          <th class="col-icon"></th>
+          <th class="col-icon"></th>
+        </tr>
+      </thead>
+      <tbody id="devices-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="timeline-card" class="card d-none">
+  <div class="card-header d-flex flex-wrap align-items-center gap-2">
+    <h6 class="mb-0"><i class="bi bi-bar-chart-steps me-2"></i><span id="timeline-title">Timeline</span></h6>
+    <span id="timeline-uptime" class="small text-muted"></span>
+    <select id="timeline-range" class="form-select form-select-sm range-select ms-auto" aria-label="Timeline range">
+      <option value="1h">Last hour</option>
+      <option value="6h">Last 6 hours</option>
+      <option value="24h" selected>Last 24 hours</option>
+      <option value="7d">Last 7 days</option>
+    </select>
+    <button id="timeline-close" class="btn btn-sm btn-icon" type="button" title="Close"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="card-body">
+    <div id="timeline-empty" class="d-none"></div>
+    <div id="timeline-wrap" class="d-none">
+      <div id="timeline-bar" class="uptime-bar"></div>
+      <div class="uptime-axis"><span id="timeline-from"></span><span id="timeline-to"></span></div>
+      <div class="uptime-legend small text-muted mt-2">
+        <span><i class="bi bi-square-fill text-success me-1"></i>online</span>
+        <span><i class="bi bi-square-fill text-danger me-1"></i>offline</span>
+        <span><i class="bi bi-square-fill uptime-unknown me-1"></i>no data</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,147 @@
+<%
+  number = ->(key, label, help = nil, unit: nil, min: 0) { { key: key, label: label, help: help, unit: unit, min: min, kind: "int" } }
+  text = ->(key, label, help = nil, placeholder: nil) { { key: key, label: label, help: help, placeholder: placeholder, kind: "text" } }
+  panes = [
+    ["broker", "bi-hdd-network", "Broker", [
+      ["Connection", [
+        text.("mqtt_host", "Host", "Hostname or IP of the MQTT broker."),
+        number.("mqtt_port", "Port", nil, min: 1),
+        text.("mqtt_user", "Username"),
+        { key: "mqtt_pass", label: "Password", kind: "secret", help: "Leave the dots untouched to keep the stored password." },
+        text.("mqtt_client_id", "Client ID", "Must be unique on the broker."),
+        number.("mqtt_keepalive_s", "Keepalive", nil, unit: "s", min: 1)
+      ]],
+      ["Subscriptions & reconnect", [
+        text.("mqtt_subscriptions", "Subscriptions", "Comma-separated filters, e.g. #,$SYS/#", placeholder: "#,$SYS/#"),
+        text.("reconnect_backoff_s", "Reconnect backoff", "Comma-separated seconds between attempts; the last one repeats.", placeholder: "2,5,10,30,60")
+      ]]
+    ]],
+    ["storage", "bi-database", "Storage", [
+      ["Sampling", [
+        { key: "dedup_enabled", label: "Drop consecutive identical payloads", kind: "bool", help: "Repeats bump the stored row's ×N counter instead of adding rows." },
+        number.("default_min_interval_ms", "Default min interval", "Store at most one message per topic per interval.", unit: "ms"),
+        { key: "sample_rules", label: "Sample rules", kind: "rules", help: "First matching pattern wins; everything else uses the default interval." },
+        number.("max_payload_bytes", "Max payload", "Larger payloads are stored truncated.", unit: "bytes", min: 1)
+      ]],
+      ["Retention", [
+        number.("retention_days", "Retention", nil, unit: "days", min: 1),
+        { key: "max_db_bytes", label: "Max database size", kind: "gb", unit: "GB", help: "Always enforced; the oldest messages go first." },
+        number.("prune_interval_s", "Prune interval", nil, unit: "s", min: 60),
+        number.("prune_batch", "Prune batch", "Rows per delete batch.", unit: "rows", min: 1)
+      ]]
+    ]],
+    ["streams", "bi-broadcast-pin", "Streams", [
+      ["Live streams (SSE)", [
+        number.("sse_max_clients", "Max clients", "Browser tabs that can stream at once.", min: 1),
+        number.("sse_idle_timeout_s", "Idle timeout", "Close a stream that had no events this long.", unit: "s", min: 10),
+        number.("sse_heartbeat_s", "Heartbeat", nil, unit: "s", min: 1),
+        number.("sse_queue_size", "Queue size", "Per-client buffer; overflow drops the oldest events.", unit: "events", min: 10)
+      ]],
+      ["Explorer", [
+        number.("rate_window_s", "Rate window", "Window for msgs/s.", unit: "s", min: 1),
+        number.("max_topics", "Max topics in memory", "Least recently seen topics are evicted beyond this.", min: 1),
+        number.("history_default_limit", "History page size", nil, unit: "rows", min: 1),
+        number.("search_default_limit", "Search result limit", nil, unit: "rows", min: 1)
+      ]]
+    ]],
+    ["presence", "bi-wifi", "Presence", [
+      ["Presence rules", [
+        { key: "presence_rules", label: "Rules", kind: "rules", help: "A device is online when online_path is truthy in its last payload and it was seen within stale_s. id_segment is the 0-based topic segment holding the device id." }
+      ]]
+    ]],
+    ["publishing", "bi-send", "Publishing", [
+      ["Publishing", [
+        { key: "publish_enabled", label: "Allow publishing from the explorer", kind: "bool", help: "UI publishes are stored with origin “ui”." }
+      ]]
+    ]]
+  ]
+-%>
+<div class="d-flex align-items-center mb-4">
+  <h4 class="page-title mb-0"><i class="bi bi-sliders me-2"></i>Settings</h4>
+</div>
+
+<div id="settings-error" class="d-none"></div>
+
+<div class="settings-layout">
+  <nav class="sidebar settings-sidebar" aria-label="Settings sections">
+<% panes.each_with_index do |(id, icon, label, _), i| -%>
+    <button class="sidebar-item<%= " active" if i.zero? %>" type="button" data-pane="<%= id %>"><i class="bi <%= icon %>"></i><span class="sidebar-item-name"><%= label %></span></button>
+<% end -%>
+  </nav>
+
+  <div class="settings-content">
+<% panes.each_with_index do |(id, _icon, label, groups), i| -%>
+    <form class="settings-pane<%= " d-none" unless i.zero? %>" data-pane="<%= id %>" autocomplete="off" novalidate>
+<% groups.each do |heading, fields| -%>
+      <div class="section-label"><%= heading %></div>
+      <div class="settings-group mb-4">
+<% fields.each do |f| -%>
+<% fid = "set-#{f[:key]}" -%>
+<% case f[:kind] -%>
+<% when "bool" -%>
+        <div class="mb-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="bool">
+            <label class="form-check-label" for="<%= fid %>"><%= f[:label] %></label>
+          </div>
+<% if f[:help] -%>
+          <div class="form-text"><%= f[:help] %></div>
+<% end -%>
+        </div>
+<% when "rules" -%>
+        <div class="mb-3">
+          <label class="form-label"><%= f[:label] %></label>
+          <div class="rules-editor" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="rules"></div>
+<% if f[:help] -%>
+          <div class="form-text"><%= f[:help] %></div>
+<% end -%>
+        </div>
+<% else -%>
+        <div class="mb-3">
+          <label class="form-label" for="<%= fid %>"><%= f[:label] %></label>
+          <div class="input-group">
+<% if f[:kind] == "secret" -%>
+            <input class="form-control" type="password" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="secret" autocomplete="new-password">
+            <button class="btn btn-outline-secondary secret-toggle" type="button" data-target="<%= fid %>" title="Show / hide"><i class="bi bi-eye"></i></button>
+<% elsif f[:kind] == "gb" -%>
+            <input class="form-control" type="number" min="0.1" step="0.1" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="gb">
+<% elsif f[:kind] == "int" -%>
+            <input class="form-control" type="number" step="1" min="<%= f[:min] %>" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="int">
+<% else -%>
+            <input class="form-control font-monospace" type="text" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="text"<% if f[:placeholder] %> placeholder="<%= f[:placeholder] %>"<% end %>>
+<% end -%>
+<% if f[:unit] -%>
+            <span class="input-group-text"><%= f[:unit] %></span>
+<% end -%>
+          </div>
+<% if f[:help] -%>
+          <div class="form-text"><%= f[:help] %></div>
+<% end -%>
+        </div>
+<% end -%>
+<% end -%>
+      </div>
+<% end -%>
+<% if id == "streams" -%>
+      <div class="section-label">This browser</div>
+      <div class="settings-group mb-4">
+        <div class="mb-3">
+          <label class="form-label" for="local-timeline-cap">Timeline rows kept live</label>
+          <div class="input-group">
+            <input class="form-control" type="number" min="50" max="5000" step="50" id="local-timeline-cap">
+            <span class="input-group-text">rows</span>
+          </div>
+          <div class="form-text">Stored in this browser only; oldest rows drop off the explorer timeline beyond this.</div>
+        </div>
+      </div>
+<% end -%>
+      <div class="d-flex gap-2 settings-actions">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>Save <%= label.downcase %></button>
+<% if id == "broker" -%>
+        <button class="btn btn-outline-secondary" type="button" id="reconnect-btn"><i class="bi bi-arrow-repeat me-1"></i>Reconnect</button>
+<% end -%>
+      </div>
+    </form>
+<% end -%>
+  </div>
+</div>

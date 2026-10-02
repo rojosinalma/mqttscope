@@ -16,7 +16,7 @@ APP_VERSION = File.read(File.expand_path("VERSION", __dir__)).strip.freeze
 # Stateful modules above load once; everything below reloads in development.
 %w[
   models/setting models/topic models/message
-  lib/topic_match lib/topic_registry lib/sampling lib/store lib/differ lib/presence
+  lib/topic_match lib/topic_registry lib/sampling lib/store lib/differ lib/presence lib/settings_validator
 ].each do |file|
   defined?(Unreloader) ? Unreloader.require(File.expand_path("#{file}.rb", __dir__)) : require_relative(file)
 end

@@ -1,4 +1,13 @@
 <% page_title = (defined?(title) && title) || "mqttscope" -%>
+<% current = defined?(nav) ? nav : nil -%>
+<% tabs = [
+     ["explorer", "/",         "bi-diagram-3",    "Explorer"],
+     ["stats",    "/stats",    "bi-speedometer2", "Stats"],
+     ["devices",  "/devices",  "bi-cpu",          "Devices"],
+     ["settings", "/settings", "bi-sliders",      "Settings"]
+   ] -%>
+<% page_script = tabs.map(&:first).include?(current) ? current : nil -%>
+<% charts = %w[explorer stats].include?(current) -%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +17,9 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<% if charts -%>
+  <link href="https://cdn.jsdelivr.net/npm/uplot@1.6.30/dist/uPlot.min.css" rel="stylesheet">
+<% end -%>
   <link href="<%= asset("css/dracula.css") %>" rel="stylesheet">
   <link href="<%= asset("css/app.css") %>" rel="stylesheet">
   <script>
@@ -18,7 +30,29 @@
   </script>
 </head>
 <body>
+  <nav class="navbar app-navbar navbar-padded sticky-top">
+    <a class="navbar-brand" href="/"><i class="bi bi-broadcast me-2"></i>mqttscope</a>
+    <span id="conn-indicator" class="conn-indicator" title="Broker connection: checking…">
+      <i class="bi bi-circle-fill status-dot status-dot--muted"></i><span id="conn-label">broker</span>
+    </span>
+    <div class="navbar-nav ms-auto d-flex flex-row gap-3 align-items-center">
+<% tabs.each do |key, href, icon, label| -%>
+      <a class="nav-link<%= " active" if current == key %>" href="<%= href %>"><i class="bi <%= icon %> me-1"></i><span class="nav-label"><%= label %></span></a>
+      <span class="nav-sep"></span>
+<% end -%>
+      <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle light/dark mode"><i class="bi bi-sun-fill theme-icon-light"></i><i class="bi bi-moon-fill theme-icon-dark"></i></button>
+    </div>
+  </nav>
+
+  <main class="main-content<%= " main-fill" if current == "explorer" %>">
+    <div id="conn-banner" class="conn-banner d-none" role="alert">
+      <i class="bi bi-plug-fill"></i>
+      <span><strong>Broker disconnected.</strong> <span id="conn-banner-detail">Live data is paused; stored history is still available.</span></span>
+      <button id="conn-banner-reconnect" class="btn btn-sm btn-outline-danger ms-auto" type="button"><i class="bi bi-arrow-repeat me-1"></i>Reconnect</button>
+    </div>
 <%== yield %>
+  </main>
+
   <div id="toast-container"></div>
   <footer class="app-footer">
     <div class="footer-right">
@@ -26,5 +60,12 @@
     </div>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<% if charts -%>
+  <script src="https://cdn.jsdelivr.net/npm/uplot@1.6.30/dist/uPlot.iife.min.js"></script>
+<% end -%>
+  <script src="<%= asset("js/common.js") %>"></script>
+<% if page_script -%>
+  <script src="<%= asset("js/#{page_script}.js") %>"></script>
+<% end -%>
 </body>
 </html>
