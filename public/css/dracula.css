@@ -18,6 +18,7 @@
   --drac-surface:    #343746;
   --drac-selection:  #44475A;
   --drac-comment:    #6272A4;
+  --drac-muted:      #A5B0D6;   /* secondary text: comment hue lifted to 6.6:1 on bg; comment stays for decoration */
   --drac-fg:         #F8F8F2;
   --drac-red:        #FF5555;
   --drac-orange:     #FFB86C;
@@ -36,9 +37,9 @@
   --bs-body-bg-rgb:          40, 42, 54;
   --bs-emphasis-color:       var(--drac-fg);
   --bs-emphasis-color-rgb:   248, 248, 242;
-  --bs-secondary-color:      var(--drac-comment);
-  --bs-secondary-color-rgb:  98, 114, 164;
-  --bs-tertiary-color:       var(--drac-comment);
+  --bs-secondary-color:      var(--drac-muted);
+  --bs-secondary-color-rgb:  165, 176, 214;
+  --bs-tertiary-color:       var(--drac-muted);
   --bs-heading-color:        inherit;
   --bs-border-color:         var(--drac-selection);
   --bs-code-color:           var(--drac-pink);
@@ -52,6 +53,7 @@
   --drac-surface:    #FFFFFF;
   --drac-selection:  #E9E9E3;
   --drac-comment:    #6272A4;
+  --drac-muted:      #4F5B8A;   /* secondary text: 6.2:1 on bg */
   --drac-fg:         #282A36;
   --drac-red:        #E30000;
   --drac-orange:     #C47F17;
@@ -68,9 +70,9 @@
   --bs-body-bg-rgb:          248, 248, 242;
   --bs-emphasis-color:       var(--drac-fg);
   --bs-emphasis-color-rgb:   40, 42, 54;
-  --bs-secondary-color:      var(--drac-comment);
-  --bs-secondary-color-rgb:  98, 114, 164;
-  --bs-tertiary-color:       var(--drac-comment);
+  --bs-secondary-color:      var(--drac-muted);
+  --bs-secondary-color-rgb:  79, 91, 138;
+  --bs-tertiary-color:       var(--drac-muted);
   --bs-heading-color:        inherit;
   --bs-border-color:         var(--drac-selection);
   --bs-code-color:           var(--drac-pink);
@@ -146,17 +148,17 @@ a:hover { color: var(--drac-pink); }
 .form-select:disabled {
   background-color: var(--drac-bg);
   border-color: var(--drac-selection);
-  color: var(--drac-comment);
+  color: var(--drac-muted);
   opacity: 1;
 }
 
 /* Read-only fields stay on the normal background (their content is there to be
    read and copied) but dim the text, so they never look editable. */
 .form-control[readonly] {
-  color: var(--drac-comment);
+  color: var(--drac-muted);
 }
 
-.form-control::placeholder { color: var(--drac-comment); }
+.form-control::placeholder { color: var(--drac-muted); }
 
 input[type="file"]::file-selector-button {
   background-color: var(--drac-bg-darker);
@@ -184,7 +186,7 @@ input[type="file"]:hover {
   margin-bottom: 0.35rem;
 }
 
-.form-text { color: var(--drac-comment); }
+.form-text { color: var(--drac-muted); }
 
 .input-group-text {
   background-color: var(--drac-selection);
@@ -232,7 +234,7 @@ input[type="file"]:hover {
 
 .btn-outline-secondary {
   border-color: var(--drac-selection);
-  color: var(--drac-comment);
+  color: var(--drac-muted);
 }
 .btn-outline-secondary:hover {
   background-color: var(--drac-selection);
@@ -376,7 +378,7 @@ h4, h5, h6 { color: var(--drac-fg); font-weight: 600; }
 }
 
 .table > thead {
-  color: var(--drac-comment);
+  color: var(--drac-muted);
   border-bottom-color: var(--drac-comment);
 }
 
@@ -385,7 +387,7 @@ h4, h5, h6 { color: var(--drac-fg); font-weight: 600; }
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--drac-comment);
+  color: var(--drac-muted);
   border-bottom: 1px solid var(--drac-comment);
 }
 
@@ -472,7 +474,7 @@ h4, h5, h6 { color: var(--drac-fg); font-weight: 600; }
 }
 
 /* ─── Misc ───────────────────────────────────────────────── */
-.text-muted { color: var(--drac-comment) !important; }
+.text-muted { color: var(--drac-muted) !important; }
 .text-success { color: var(--drac-green) !important; }
 .text-danger { color: var(--drac-red) !important; }
 
@@ -507,7 +509,7 @@ body  { overflow-x: hidden; }
   border: none;
   padding: 0;
   cursor: pointer;
-  color: var(--drac-comment);
+  color: var(--drac-muted);
   font-size: 0.85rem;
   line-height: 1;
   transition: color 0.15s;
