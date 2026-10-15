@@ -7,11 +7,11 @@ Timestamps are Integer **milliseconds since epoch** (`ts_ms`). Payloads are `Str
 
 | key | default | meaning |
 |---|---|---|
-| `mqtt_host` | `mosquitto` | broker host |
-| `mqtt_port` | `1883` | |
-| `mqtt_user` | `mqttscope` | |
+| `mqtt_host` | `ENV["MQTT_HOST"]` at first boot, else `mosquitto` | broker host |
+| `mqtt_port` | `ENV["MQTT_PORT"]` at first boot, else `1883` | |
+| `mqtt_user` | `ENV["MQTT_USER"]` at first boot, else empty (anonymous) | |
 | `mqtt_pass` | `ENV["MQTT_PASS"]` at first boot | |
-| `mqtt_client_id` | `mqttscope` | |
+| `mqtt_client_id` | `ENV["MQTT_CLIENT_ID"]` at first boot, else `mqttscope` | |
 | `mqtt_subscriptions` | `#,$SYS/#` | comma list of filters the ingest subscribes to |
 | `mqtt_keepalive_s` | `30` | |
 | `reconnect_backoff_s` | `2,5,10,30,60` | comma list |
@@ -19,7 +19,7 @@ Timestamps are Integer **milliseconds since epoch** (`ts_ms`). Payloads are `Str
 | `max_payload_bytes` | `262144` | larger payloads are stored truncated, flagged `truncated: true` |
 | `dedup_enabled` | `true` | drop consecutive identical payloads per topic (bump `dup_count`) |
 | `default_min_interval_ms` | `1000` | store at most one message per topic per interval |
-| `sample_rules` | JSON `[{"pattern":"esp32/+/data","min_interval_ms":10000},{"pattern":"$SYS/#","min_interval_ms":60000}]` | first matching rule wins |
+| `sample_rules` | JSON `[{"pattern":"$SYS/#","min_interval_ms":60000}]` | first matching rule wins; e.g. add `{"pattern":"esp32/+/data","min_interval_ms":10000}` to throttle a chatty device family |
 | `retention_days` | `7` | |
 | `max_db_bytes` | `10737418240` | 10 GB, always enforced |
 | `prune_interval_s` | `3600` | |
@@ -30,7 +30,7 @@ Timestamps are Integer **milliseconds since epoch** (`ts_ms`). Payloads are `Str
 | `sse_idle_timeout_s` | `300` | close a stream idle this long (no events, heartbeats don't count) |
 | `sse_heartbeat_s` | `15` | `: ping` comment interval |
 | `sse_queue_size` | `500` | per-client queue; overflow drops oldest and emits `{type:"dropped",n}` |
-| `presence_rules` | JSON `[{"name":"esp32","pattern":"esp32/+/status","id_segment":1,"online_path":"online","label_path":"hostname","stale_s":90}]` | |
+| `presence_rules` | JSON `[]` | no devices tracked until a rule is added, e.g. `{"name":"esp32","pattern":"esp32/+/status","id_segment":1,"online_path":"online","label_path":"hostname","stale_s":90}` |
 | `history_default_limit` | `200` | |
 | `search_default_limit` | `100` | |
 | `series_max_rows` | `50000` | rows scanned per `Store.series` call |

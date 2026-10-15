@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Runs every test/*_test.rb in its own process with its own throwaway database.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+passed=0
+failed=()
+for t in test/*_test.rb; do
+  name="$(basename "$t" .rb)"
+  echo "== $name"
+  if DATABASE_PATH="/tmp/mqttscope-test-$name.db" bundle exec ruby -Itest "$t"; then
+    passed=$((passed + 1))
+  else
+    failed+=("$name")
+  fi
+done
+
+total=$((passed + ${#failed[@]}))
+if [ ${#failed[@]} -eq 0 ]; then
+  echo "OK: $passed/$total test files passed"
+else
+  echo "FAIL: $passed/$total test files passed; failed: ${failed[*]}"
+  exit 1
+fi
