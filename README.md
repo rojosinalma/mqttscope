@@ -22,12 +22,27 @@ single broker connection.
 
 ## Quick start
 
+Prebuilt images are published to `ghcr.io/rojosinalma/mqttscope` (`latest`, `sha-<commit>`,
+`<version>`; linux/amd64 and linux/arm64) on every push to `main` and every `v*` tag.
+
+```sh
+mkdir mqttscope && cd mqttscope
+curl -fsSLO https://raw.githubusercontent.com/rojosinalma/mqttscope/main/.env.example
+curl -fsSL https://raw.githubusercontent.com/rojosinalma/mqttscope/main/compose.example.yaml -o compose.yaml
+cp .env.example .env
+$EDITOR .env                 # set MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASS
+docker compose up -d
+```
+
+To build from source instead, clone the repo and swap the `image:` line in `compose.yaml` for
+`build: .`:
+
 ```sh
 git clone https://github.com/rojosinalma/mqttscope.git
 cd mqttscope
 cp .env.example .env
 cp compose.example.yaml compose.yaml
-$EDITOR .env                 # set MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASS
+$EDITOR .env
 docker compose up -d --build
 ```
 

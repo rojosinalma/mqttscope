@@ -13,6 +13,8 @@ RUN bundle install
 
 COPY . .
 
+ENV RACK_ENV=production
+
 EXPOSE 9292
 
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "config.ru"]
