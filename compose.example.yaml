@@ -3,7 +3,8 @@
 # change them in the Settings page.
 services:
   mqttscope:
-    build: .
+    image: ghcr.io/rojosinalma/mqttscope:latest
+    # build: .   # instead of image:, when running from a clone of the repo
     restart: unless-stopped
     ports:
       - "9292:9292"

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- GitHub Actions workflow publishing `ghcr.io/rojosinalma/mqttscope` (linux/amd64, linux/arm64) on every push to `main` and every `v*` tag.
+- `compose.example.yaml` uses the published image; the Dockerfile defaults to `RACK_ENV=production`.
+
 ## [0.1.0] - 2026-10-16
 
 ### Added
