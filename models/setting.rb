@@ -4,24 +4,22 @@ class Setting < Sequel::Model(:settings)
   unrestrict_primary_key
 
   DEFAULT_SAMPLE_RULES = [
-    { pattern: "esp32/+/data", min_interval_ms: 10_000 },
     { pattern: "$SYS/#", min_interval_ms: 60_000 }
   ].freeze
 
-  DEFAULT_PRESENCE_RULES = [
-    { name: "esp32", pattern: "esp32/+/status", id_segment: 1, online_path: "online", label_path: "hostname", stale_s: 90 }
-  ].freeze
+  DEFAULT_PRESENCE_RULES = [].freeze
 
   SECRET_KEYS = %w[mqtt_pass].freeze
   CONNECTION_KEYS = %w[mqtt_host mqtt_port mqtt_user mqtt_pass mqtt_client_id mqtt_subscriptions mqtt_keepalive_s].freeze
 
+  # Connection values are seeded from the environment on first boot only; afterwards the DB wins.
   def self.defaults
     {
-      "mqtt_host" => "mosquitto",
-      "mqtt_port" => "1883",
-      "mqtt_user" => "mqttscope",
+      "mqtt_host" => ENV.fetch("MQTT_HOST", "mosquitto"),
+      "mqtt_port" => ENV.fetch("MQTT_PORT", "1883"),
+      "mqtt_user" => ENV.fetch("MQTT_USER", ""),
       "mqtt_pass" => ENV.fetch("MQTT_PASS", ""),
-      "mqtt_client_id" => "mqttscope",
+      "mqtt_client_id" => ENV.fetch("MQTT_CLIENT_ID", "mqttscope"),
       "mqtt_subscriptions" => "#,$SYS/#",
       "mqtt_keepalive_s" => "30",
       "reconnect_backoff_s" => "2,5,10,30,60",

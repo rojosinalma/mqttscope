@@ -7,9 +7,7 @@ require_relative "../lib/differ"
 
 unless defined?(Setting)
   module Setting
-    DEFAULT_PRESENCE_RULES = [
-      { name: "esp32", pattern: "esp32/+/status", id_segment: 1, online_path: "online", label_path: "hostname", stale_s: 90 }
-    ].freeze
+    DEFAULT_PRESENCE_RULES = [].freeze
 
     class << self
       attr_accessor :values
@@ -69,7 +67,17 @@ class PresenceTest < Minitest::Test
 
   def at_now = yield
 
-  def test_rules_default_normalised
+  ESP32_RULE = { "name" => "esp32", "pattern" => "esp32/+/status", "id_segment" => 1,
+                 "online_path" => "online", "label_path" => "hostname", "stale_s" => 90 }.freeze
+
+  def esp32_rule! = Setting.values["presence_rules"] = JSON.generate([ESP32_RULE])
+
+  def test_rules_default_empty
+    assert_equal [], Presence.rules
+  end
+
+  def test_rules_normalised
+    esp32_rule!
     assert_equal [{ name: "esp32", pattern: "esp32/+/status", id_segment: 1, online_path: "online",
                     label_path: "hostname", stale_s: 90 }], Presence.rules
   end
@@ -91,6 +99,7 @@ class PresenceTest < Minitest::Test
   end
 
   def test_devices_online_offline_stale
+    esp32_rule!
     TopicRegistry.entries = [
       entry("esp32/b/status", '{"online":true,"hostname":"Beta","rssi":-60}', NOW - 1_000),
       entry("esp32/a/status", '{"online":false}', NOW - 1_000),
@@ -112,6 +121,7 @@ class PresenceTest < Minitest::Test
   end
 
   def test_devices_garbage_payload
+    esp32_rule!
     TopicRegistry.entries = [entry("esp32/x/status", "\xFF\x00".b, NOW), entry("esp32/y/status", "{bad", NOW)]
     devices = at_now { Presence.devices }
     assert_equal [false, false], devices.map { |d| d[:online] }
@@ -127,6 +137,7 @@ class PresenceTest < Minitest::Test
   end
 
   def test_since_scans_history_until_flip
+    esp32_rule!
     topic = "esp32/a/status"
     TopicRegistry.entries = [entry(topic, '{"online":true}', NOW - 1_000)]
     Store.rows[topic] = [msg(NOW - 1_000, '{"online":true}'), msg(NOW - 31_000, '{"online":true}'),
@@ -138,6 +149,7 @@ class PresenceTest < Minitest::Test
   end
 
   def test_since_falls_back_to_last_seen
+    esp32_rule!
     TopicRegistry.entries = [entry("esp32/a/status", '{"online":true}', NOW - 5)]
     assert_equal NOW - 5, at_now { Presence.devices }.first[:since_ms]
   end
@@ -152,6 +164,7 @@ class PresenceTest < Minitest::Test
   end
 
   def test_timeline_collapses_and_inserts_stale_gaps
+    esp32_rule!
     topic = "esp32/a/status"
     TopicRegistry.entries = [entry(topic, '{"online":true}', NOW - 1_000)]
     t0 = NOW - 1_000_000
@@ -177,6 +190,7 @@ class PresenceTest < Minitest::Test
   end
 
   def test_timeline_goes_offline_when_silent_at_end
+    esp32_rule!
     topic = "esp32/a/status"
     TopicRegistry.entries = [entry(topic, '{"online":true}', NOW - 500_000)]
     Store.rows[topic] = [msg(NOW - 500_000, '{"online":true}')]
@@ -186,6 +200,7 @@ class PresenceTest < Minitest::Test
   end
 
   def test_timeline_unknown_device
+    esp32_rule!
     assert_equal [], Presence.timeline(id: "nope", from_ms: nil, to_ms: nil)
   end
 end

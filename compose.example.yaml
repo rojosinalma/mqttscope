@@ -1,0 +1,15 @@
+# Copy to compose.yaml, then set MQTT_HOST / MQTT_PORT / MQTT_USER / MQTT_PASS in .env
+# (see .env.example). The values seed the settings DB on first boot; afterwards
+# change them in the Settings page.
+services:
+  mqttscope:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "9292:9292"
+    env_file: .env
+    environment:
+      - RACK_ENV=production
+      - PORT=9292
+    volumes:
+      - ./data:/app/data
