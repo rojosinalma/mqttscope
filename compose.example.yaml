@@ -1,11 +1,13 @@
 # Copy to compose.yaml, then set MQTT_HOST / MQTT_PORT / MQTT_USER / MQTT_PASS in .env
 # (see .env.example). The values seed the settings DB on first boot; afterwards
-# change them in the Settings page.
+# change them in the Settings page. Create ./data before the first start: the container runs
+# as uid 1000 and needs to own it (chown 1000 data, or set user: below to your own uid:gid).
 services:
   mqttscope:
     image: ghcr.io/rojosinalma/mqttscope:latest
     # build: .   # instead of image:, when running from a clone of the repo
     restart: unless-stopped
+    # user: "1000:1000"
     ports:
       - "9292:9292"
     env_file: .env

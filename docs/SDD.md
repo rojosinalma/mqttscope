@@ -157,7 +157,8 @@ chosen to keep the tool small and dependable; the architecture does not preclude
 - **Logs** go to stdout with a severity and a subsystem prefix (`[mqtt]`, `[db]`, `[store]`, `[sse]`,
   `[http]`, `[prune]`, `[presence]`, `[settings]`, `[thread]`); `LOG_LEVEL` sets the threshold. Background thread errors are logged with
   a full backtrace via `WorkerPool.safe_thread`.
-- **Health.** `GET /api/stats` returns `ingest.connected` and database figures; `bin/verify`
+- **Health.** The image's `HEALTHCHECK` curls `GET /api/stats` every 30 s, so `docker ps` shows
+  `healthy` once Puma answers. The endpoint returns `ingest.connected` and database figures; `bin/verify`
   (`docker compose exec mqttscope /app/bin/verify`) checks the API, the broker connection, a live
   SSE event and the UI, exiting non-zero on failure. `connection` SSE events announce broker state
   changes to live clients.

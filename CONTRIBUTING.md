@@ -49,16 +49,21 @@ after a deploy.
 
 - One logical change per commit, imperative subject line ("Add series bucketing", "Fix SSE leak on
   client close"), body only when the why is not obvious.
+- Every commit is GPG- or SSH-signed (`git config commit.gpgsign true`); `main` is protected and
+  only accepts signed, test-passing history.
 - Run `bin/test` before pushing; the `run-tests` workflow runs it on every push and pull request.
 - A PR describes what changed and how you verified it. Add a line to `CHANGELOG.md` under
   *Unreleased* for anything user-visible.
 
 ## Documentation
 
-The README stays short (what it is, requirements, setup, licence). Everything else lives in `docs/`:
+The README stays short (what it is, requirements, installation, usage, development, licence).
+Everything else lives in `docs/` or in the standard files at the root:
 
 | File | What goes there |
 |---|---|
+| `SECURITY.md` | how to report a vulnerability, supported versions |
+| `CODE_OF_CONDUCT.md` | Contributor Covenant 2.1 |
 | `docs/configuration.md` | environment variables, every settings key, sampling and presence rules, retention |
 | `docs/api.md` | HTTP endpoints, response shapes, the SSE event types |
 | `docs/contracts.md` | the Ruby interface of each module in `lib/` |
@@ -70,6 +75,10 @@ The README stays short (what it is, requirements, setup, licence). Everything el
 ## Releasing
 
 1. Update `VERSION` and move the *Unreleased* entries in `CHANGELOG.md` under the new version.
-2. Commit, tag `vX.Y.Z` and push the tag.
+2. Commit, create a signed tag `vX.Y.Z` (`git tag -s`) and push it, then publish a GitHub release
+   whose notes are that changelog section.
 3. The `publish-image` workflow builds `ghcr.io/rojosinalma/mqttscope:X.Y.Z`, `:X.Y`, `:sha-<short>`
    and, from `main`, `:latest` (linux/amd64 and linux/arm64).
+
+By contributing you agree that your contributions are licensed under the AGPL-3.0, like the rest of
+the project (see [`LICENSE`](LICENSE)).

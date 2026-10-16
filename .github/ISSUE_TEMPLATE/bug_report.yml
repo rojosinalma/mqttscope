@@ -1,0 +1,57 @@
+name: Bug report
+description: Something does not work as documented
+title: "Bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for the report. Remove broker credentials and private payloads from logs before pasting.
+  - type: input
+    id: version
+    attributes:
+      label: mqttscope version
+      description: The image tag or the contents of `VERSION`.
+      placeholder: v0.2.1 / ghcr.io/rojosinalma/mqttscope:latest
+    validations:
+      required: true
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: How do you run it?
+      options:
+        - Docker image (ghcr.io)
+        - Docker, built from source
+        - Ruby directly (bundle exec puma)
+    validations:
+      required: true
+  - type: input
+    id: broker
+    attributes:
+      label: Broker
+      placeholder: Mosquitto 2.0.18, EMQX 5.x, …
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the explorer
+        2. Select topic `sensors/+/temperature`
+        3. …
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant `docker logs mqttscope` lines. Credentials redacted.
+      render: text
+  - type: input
+    id: browser
+    attributes:
+      label: Browser / OS
+      placeholder: Firefox 140 on Linux
