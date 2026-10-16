@@ -1,4 +1,4 @@
-FROM ruby:3.3-slim
+FROM ruby:4.0-slim
 
 LABEL org.opencontainers.image.source="https://github.com/rojosinalma/mqttscope" \
       org.opencontainers.image.description="Web explorer for an MQTT broker: live topic tree, searchable history, diffs, charts, device presence and broker stats" \
