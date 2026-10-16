@@ -1,8 +1,8 @@
 <header class="t-page-header">
-  <h1 class="t-page-title"><i class="t-icon bi bi-cpu" aria-hidden="true"></i>Devices</h1>
+  <h1 class="t-page-title"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-cpu"/></svg>Devices</h1>
   <div class="t-page-actions">
     <div class="t-input-group device-filter" data-size="sm">
-      <span class="t-input-addon"><i class="bi bi-funnel" aria-hidden="true"></i></span>
+      <span class="t-input-addon"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-funnel"/></svg></span>
       <input id="device-filter" data-hotkey="/" class="t-input" type="search" placeholder="Filter devices" aria-label="Filter devices">
     </div>
     <span id="device-count" class="t-small t-muted t-nowrap"></span>
@@ -32,16 +32,16 @@
 
 <div id="timeline-card" class="t-card t-section" hidden>
   <div class="t-card-header">
-    <h3 class="t-card-title"><i class="t-icon bi bi-bar-chart-steps" aria-hidden="true"></i><span id="timeline-title">Timeline</span></h3>
+    <h3 class="t-card-title"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-bar-chart-steps"/></svg><span id="timeline-title">Timeline</span></h3>
     <span id="timeline-uptime" class="t-small t-muted"></span>
-    <span class="card-header-end card-header-tools">
-      <select id="timeline-range" class="t-select range-select" data-size="sm" aria-label="Timeline range">
+    <span class="t-card-tools">
+      <select id="timeline-range" class="t-select range-select" data-size="sm" data-width="auto" aria-label="Timeline range">
         <option value="1h">Last hour</option>
         <option value="6h">Last 6 hours</option>
         <option value="24h" selected>Last 24 hours</option>
         <option value="7d">Last 7 days</option>
       </select>
-      <button id="timeline-close" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Close" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+      <button id="timeline-close" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Close" aria-label="Close"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-x-lg"/></svg></button>
     </span>
   </div>
   <div class="t-card-body">

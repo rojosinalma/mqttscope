@@ -1,13 +1,13 @@
 <header class="t-page-header">
-  <h1 class="t-page-title"><i class="t-icon bi bi-speedometer2" aria-hidden="true"></i>Stats</h1>
+  <h1 class="t-page-title"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-speedometer2"/></svg>Stats</h1>
   <div class="t-page-actions"><span id="stats-updated" class="t-small t-muted"></span></div>
 </header>
 
 <div class="t-grid stats-grid" data-min="md">
   <div class="t-card">
     <div class="t-card-header">
-      <h3 class="t-card-title"><i class="t-icon bi bi-box-arrow-in-down" aria-hidden="true"></i>Ingest</h3>
-      <span id="ingest-badge" class="card-header-end"></span>
+      <h3 class="t-card-title"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-box-arrow-in-down"/></svg>Ingest</h3>
+      <span id="ingest-badge" class="t-card-tools"></span>
     </div>
     <div class="t-card-body">
       <dl id="ingest-kv" class="kv"></dl>
@@ -16,10 +16,10 @@
 
   <div class="t-card">
     <div class="t-card-header">
-      <h3 class="t-card-title"><i class="t-icon bi bi-database" aria-hidden="true"></i>Database</h3>
-      <span class="card-header-end card-header-tools">
+      <h3 class="t-card-title"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-database"/></svg>Database</h3>
+      <span class="t-card-tools">
         <span id="db-governing"></span>
-        <button id="prune-btn" class="t-btn" data-size="sm" data-tone="warning" type="button"><i class="t-icon bi bi-scissors" aria-hidden="true"></i>Prune now</button>
+        <button id="prune-btn" class="t-btn" data-size="sm" data-tone="warning" type="button"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-scissors"/></svg>Prune now</button>
       </span>
     </div>
     <div class="t-card-body">
@@ -48,8 +48,8 @@
 
 <details id="sys-all-card" class="t-card t-section" data-variant="collapsible">
   <summary class="t-card-header">
-    <h3 class="t-card-title"><i class="t-icon bi bi-list-ul" aria-hidden="true"></i>All $SYS topics</h3>
-    <span id="sys-all-count" class="card-header-end t-small t-muted"></span>
+    <h3 class="t-card-title"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-list-ul"/></svg>All $SYS topics</h3>
+    <span id="sys-all-count" class="t-card-tools t-small t-muted"></span>
   </summary>
   <div id="sys-all" class="t-table-wrap">
     <table class="t-table" data-variant="data" data-density="compact">

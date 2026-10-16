@@ -22,30 +22,30 @@
   };
 
   const GROUPS = [
-    { title: 'Clients', icon: 'bi-people', rows: [
+    { title: 'Clients', icon: 'people', rows: [
       ['clients/connected', 'Connected', F.int], ['clients/total', 'Total', F.int], ['clients/maximum', 'Maximum', F.int],
       ['clients/disconnected', 'Disconnected', F.int], ['clients/expired', 'Expired', F.int], ['clients/active', 'Active', F.int]
     ] },
-    { title: 'Messages', icon: 'bi-envelope', rows: [
+    { title: 'Messages', icon: 'envelope', rows: [
       ['messages/received', 'Received', F.int], ['messages/sent', 'Sent', F.int], ['messages/stored', 'Stored', F.int],
       ['retained messages/count', 'Retained', F.int], ['store/messages/count', 'In store', F.int],
       ['publish/messages/dropped', 'Dropped', F.int], ['subscriptions/count', 'Subscriptions', F.int]
     ] },
-    { title: 'Bytes', icon: 'bi-hdd-network', rows: [
+    { title: 'Bytes', icon: 'hdd-network', rows: [
       ['bytes/received', 'Received', F.bytes], ['bytes/sent', 'Sent', F.bytes], ['store/messages/bytes', 'Store', F.bytes],
       ['publish/bytes/received', 'Publish in', F.bytes], ['publish/bytes/sent', 'Publish out', F.bytes]
     ] },
-    { title: 'Load · 1 min', icon: 'bi-activity', rows: [
+    { title: 'Load · 1 min', icon: 'activity', rows: [
       ['load/messages/received/1min', 'Messages in', F.perMin], ['load/messages/sent/1min', 'Messages out', F.perMin],
       ['load/publish/received/1min', 'Publish in', F.perMin], ['load/publish/sent/1min', 'Publish out', F.perMin],
       ['load/bytes/received/1min', 'Bytes in', F.bytesMin], ['load/bytes/sent/1min', 'Bytes out', F.bytesMin],
       ['load/connections/1min', 'Connections', F.perMin], ['load/sockets/1min', 'Sockets', F.perMin]
     ] },
-    { title: 'Load · 15 min', icon: 'bi-activity', rows: [
+    { title: 'Load · 15 min', icon: 'activity', rows: [
       ['load/messages/received/15min', 'Messages in', F.perMin], ['load/messages/sent/15min', 'Messages out', F.perMin],
       ['load/bytes/received/15min', 'Bytes in', F.bytesMin], ['load/bytes/sent/15min', 'Bytes out', F.bytesMin]
     ] },
-    { title: 'Broker', icon: 'bi-hdd-rack', rows: [
+    { title: 'Broker', icon: 'hdd-rack', rows: [
       ['version', 'Version', F.text], ['uptime', 'Uptime', F.uptime], ['heap/current', 'Heap', F.bytes], ['heap/maximum', 'Heap peak', F.bytes]
     ] }
   ];
@@ -124,12 +124,12 @@
     $('sys-empty').hidden = keys.length > 0;
     $('sys-groups').hidden = !keys.length;
     if (!keys.length) {
-      $('sys-empty').innerHTML = `<div class="t-card">${MS.empty('bi-hdd-rack', 'No $SYS data stored yet.', 'Needs $SYS/# in the broker subscriptions; values are sampled about once a minute.', false)}</div>`;
+      $('sys-empty').innerHTML = `<div class="t-card">${MS.empty('hdd-rack', 'No $SYS data stored yet.', 'Needs $SYS/# in the broker subscriptions; values are sampled about once a minute.', false)}</div>`;
     }
     $('sys-groups').innerHTML = GROUPS.map((g) => {
       const rows = g.rows.filter(([k]) => sys[SYS + k] !== undefined).map(([k, label, fmt]) => [label, esc(fmt(sys[SYS + k])), SYS + k]);
       if (!rows.length) return '';
-      return `<div class="t-card"><div class="t-card-header"><h3 class="t-card-title"><i class="t-icon bi ${g.icon}" aria-hidden="true"></i>${esc(g.title)}</h3></div>`
+      return `<div class="t-card"><div class="t-card-header"><h3 class="t-card-title">${MS.icon(g.icon)}${esc(g.title)}</h3></div>`
         + `<div class="t-card-body"><dl class="kv">${kv(rows)}</dl></div></div>`;
     }).join('');
 
@@ -141,7 +141,7 @@
     const keys = Object.keys(state.sys).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
     $('sys-all-body').innerHTML = keys.length
       ? keys.map((k) => `<tr><td class="t-mono t-small">${esc(k)}</td><td class="t-mono t-small t-col-num">${esc(String(state.sys[k]).slice(0, 200))}</td></tr>`).join('')
-      : `<tr><td colspan="2">${MS.empty('bi-inbox', 'No $SYS topics yet.')}</td></tr>`;
+      : `<tr><td colspan="2">${MS.empty('inbox', 'No $SYS topics yet.')}</td></tr>`;
   }
 
   // ─── Sparklines ─────────────────────────────────────────

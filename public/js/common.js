@@ -133,8 +133,11 @@
     try { return await fn(); } finally { btn.disabled = false; btn.removeAttribute('aria-busy'); btn.innerHTML = html; }
   };
 
+  // Icon from the tailor sprite (public/tailor/icons.svg, Bootstrap Icons names without the bi- prefix); decorative.
+  MS.icon = (name, cls = '') => `<svg class="t-icon${cls ? ' ' + cls : ''}" aria-hidden="true"><use href="/tailor/icons.svg#bi-${name}"/></svg>`;
+
   MS.empty = (icon, text, hint, compact = true) =>
-    `<div class="t-empty"${compact ? ' data-size="sm"' : ''}><i class="t-icon t-empty-icon bi ${icon}" aria-hidden="true"></i><div class="t-empty-title">${MS.esc(text)}</div>${hint ? `<p>${MS.esc(hint)}</p>` : ''}</div>`;
+    `<div class="t-empty"${compact ? ' data-size="sm"' : ''}>${MS.icon(icon, 't-empty-icon')}<div class="t-empty-title">${MS.esc(text)}</div>${hint ? `<p>${MS.esc(hint)}</p>` : ''}</div>`;
   MS.loading = () => '<div class="t-empty" data-size="sm"><span class="t-spinner" data-size="sm" role="status" aria-label="Loading"></span></div>';
 
   // ─── Theme (tailor owns skin/palette/mode; charts re-render when <html> data-* change) ──
@@ -288,7 +291,7 @@
   // A themed line chart that resizes with its box and rebuilds on skin/palette/mode change.
   MS.chart = (el, { data, label = 'value', color = 'purple', height = 220, spark = false, fmt } = {}) => {
     if (!window.uPlot) {
-      el.innerHTML = MS.empty('bi-exclamation-triangle', 'Chart library failed to load (cdn.jsdelivr.net).');
+      el.innerHTML = MS.empty('exclamation-triangle', 'Chart library failed to load (cdn.jsdelivr.net).');
       return { setData() {}, destroy() {} };
     }
     let plot = null;

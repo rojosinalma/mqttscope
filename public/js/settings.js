@@ -34,9 +34,9 @@
     return `<tr>${cols.map((c) => `<td><input class="t-input t-mono${c.type === 'int' ? ' rule-num' : ''}" data-size="sm" type="${c.type === 'int' ? 'number' : 'text'}"`
       + ` data-col="${c.key}" value="${esc(rule[c.key] ?? '')}" placeholder="${esc(c.placeholder || '')}" aria-label="${esc(c.label)}"></td>`).join('')}`
       + '<td class="t-col-actions">'
-      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="-1" title="Move up" aria-label="Move up"><i class="bi bi-arrow-up"></i></button>'
-      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="1" title="Move down" aria-label="Move down"><i class="bi bi-arrow-down"></i></button>'
-      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" data-tone="danger" type="button" data-remove title="Remove" aria-label="Remove"><i class="bi bi-trash"></i></button></td></tr>';
+      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="-1" title="Move up" aria-label="Move up">' + MS.icon('arrow-up') + '</button>'
+      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="1" title="Move down" aria-label="Move down">' + MS.icon('arrow-down') + '</button>'
+      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" data-tone="danger" type="button" data-remove title="Remove" aria-label="Remove">' + MS.icon('trash') + '</button></td></tr>';
   }
 
   function renderRules(editor, rules) {
@@ -44,7 +44,7 @@
     editor.innerHTML = `<table class="t-table rules-table" data-density="compact"><thead><tr>${cols.map((c) => `<th>${esc(c.label)}</th>`).join('')}<th class="t-col-actions"></th></tr></thead>`
       + `<tbody>${rules.map((r) => ruleRowHTML(cols, r)).join('')}</tbody></table>`
       + `<div class="rules-empty"${rules.length ? ' hidden' : ''}>No rules.</div>`
-      + '<button class="t-btn" data-size="sm" type="button" data-add><i class="t-icon bi bi-plus-lg" aria-hidden="true"></i>Add rule</button>';
+      + '<button class="t-btn" data-size="sm" type="button" data-add>' + MS.icon('plus-lg') + 'Add rule</button>';
   }
 
   function syncRulesEmpty(editor) {
@@ -182,7 +182,7 @@
     } catch (e) {
       const box = $('settings-error');
       box.hidden = false;
-      box.innerHTML = `<div class="t-alert" data-tone="danger" role="alert"><i class="t-icon t-alert-icon bi bi-exclamation-triangle" aria-hidden="true"></i><div class="t-alert-body">Could not load settings: ${esc(e.message)}</div></div>`;
+      box.innerHTML = `<div class="t-alert" data-tone="danger" role="alert">${MS.icon('exclamation-triangle', 't-alert-icon')}<div class="t-alert-body">Could not load settings: ${esc(e.message)}</div></div>`;
       document.querySelectorAll('.settings-pane [type="submit"]').forEach((b) => { b.disabled = true; });
     }
   }
@@ -198,7 +198,7 @@
       const input = $(btn.dataset.target);
       const show = input.type === 'password';
       input.type = show ? 'text' : 'password';
-      btn.querySelector('i').className = `bi ${show ? 'bi-eye-slash' : 'bi-eye'}`;
+      btn.innerHTML = MS.icon(show ? 'eye-slash' : 'eye');
     }));
     document.querySelectorAll('[data-kind="secret"]').forEach((el) => el.addEventListener('focus', () => { if (el.value === MASK) el.select(); }));
 
