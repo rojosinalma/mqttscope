@@ -1,10 +1,8 @@
 .git
-.openchamber
 data
 .env
 *.db
 *.db-wal
 *.db-shm
-AGENTS.md
 compose.yaml
 compose.override.yaml

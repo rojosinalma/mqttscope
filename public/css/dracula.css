@@ -1,14 +1,13 @@
 /*
- * House theme — Dracula Classic (dark) https://draculatheme.com/spec
+ * dracula.css — Dracula Classic (dark) https://draculatheme.com/spec
  *               Alucard (light)        https://draculatheme.com/alucard
  *
  * Foundation only: palette, the Bootstrap colour bridge, Bootstrap retints, base layout and the
  * theme toggle. Components (badges, toasts, menus, sidebars...) are NOT here: each project defines
- * its own in public/css/app.css, adapting the concepts in the skill's assets/reference/.
+ * its own in public/css/app.css on top of this file.
  *
- * Canonical copy: tailor/assets/dracula.css
- * Every project ships an identical copy at public/css/dracula.css, kept in step by `dracula-sync`.
- * Never edit a copy: change the canonical file and run `dracula-sync`.
+ * Shared foundation: this file is kept identical across every project that uses it.
+ * Do not edit it in place; update the shared source and re-sync.
  */
 
 :root, [data-theme="dark"] {
