@@ -128,4 +128,4 @@ A bare JSON scalar flattens to path `""` (root) — `Store.series` must accept `
 
 ## Pages (`routes/pages.rb` + `views/`)
 
-`/` explorer · `/stats` · `/devices` · `/settings`. Layout: `views/layout.erb` (navbar, footer with VERSION, toast container, theme toggle). JS in `public/js/`, CSS in `public/css/app.css`.
+`/` explorer · `/stats` · `/devices` · `/settings`. Layout: `views/layout.erb` (tailor head snippet, navbar with skin/palette pickers and mode toggle, footer with VERSION, `#t-toasts`). JS in `public/js/`, project CSS in `public/css/app.css` on `--t-*` tokens; vendored tailor assets in `public/tailor/` (`tailor sync`).

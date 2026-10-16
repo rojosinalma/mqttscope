@@ -31,24 +31,24 @@
   }
 
   function ruleRowHTML(cols, rule) {
-    return `<tr>${cols.map((c) => `<td><input class="form-control${c.type === 'int' ? ' rule-num' : ''}" type="${c.type === 'int' ? 'number' : 'text'}"`
+    return `<tr>${cols.map((c) => `<td><input class="t-input t-mono${c.type === 'int' ? ' rule-num' : ''}" data-size="sm" type="${c.type === 'int' ? 'number' : 'text'}"`
       + ` data-col="${c.key}" value="${esc(rule[c.key] ?? '')}" placeholder="${esc(c.placeholder || '')}" aria-label="${esc(c.label)}"></td>`).join('')}`
-      + '<td class="col-icon text-nowrap">'
-      + '<button class="btn btn-sm btn-icon" type="button" data-move="-1" title="Move up"><i class="bi bi-arrow-up"></i></button>'
-      + '<button class="btn btn-sm btn-icon" type="button" data-move="1" title="Move down"><i class="bi bi-arrow-down"></i></button>'
-      + '<button class="btn btn-sm btn-icon" type="button" data-remove title="Remove"><i class="bi bi-trash"></i></button></td></tr>';
+      + '<td class="t-col-actions">'
+      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="-1" title="Move up" aria-label="Move up"><i class="bi bi-arrow-up"></i></button>'
+      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="1" title="Move down" aria-label="Move down"><i class="bi bi-arrow-down"></i></button>'
+      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" data-tone="danger" type="button" data-remove title="Remove" aria-label="Remove"><i class="bi bi-trash"></i></button></td></tr>';
   }
 
   function renderRules(editor, rules) {
     const cols = RULE_COLUMNS[editor.dataset.key];
-    editor.innerHTML = `<table class="table table-sm rules-table"><thead><tr>${cols.map((c) => `<th>${esc(c.label)}</th>`).join('')}<th class="col-icon"></th></tr></thead>`
+    editor.innerHTML = `<table class="t-table rules-table" data-density="compact"><thead><tr>${cols.map((c) => `<th>${esc(c.label)}</th>`).join('')}<th class="t-col-actions"></th></tr></thead>`
       + `<tbody>${rules.map((r) => ruleRowHTML(cols, r)).join('')}</tbody></table>`
-      + `<div class="rules-empty${rules.length ? ' d-none' : ''}">No rules.</div>`
-      + '<button class="btn btn-sm btn-outline-secondary" type="button" data-add><i class="bi bi-plus-lg me-1"></i>Add rule</button>';
+      + `<div class="rules-empty"${rules.length ? ' hidden' : ''}>No rules.</div>`
+      + '<button class="t-btn" data-size="sm" type="button" data-add><i class="t-icon bi bi-plus-lg" aria-hidden="true"></i>Add rule</button>';
   }
 
   function syncRulesEmpty(editor) {
-    editor.querySelector('.rules-empty').classList.toggle('d-none', editor.querySelectorAll('tbody tr').length > 0);
+    editor.querySelector('.rules-empty').hidden = editor.querySelectorAll('tbody tr').length > 0;
   }
 
   // Returns {value: JSON string} or {error}.
@@ -119,7 +119,7 @@
 
   // Returns {value} (string as stored) or {error}.
   function readField(el) {
-    const label = el.closest('.mb-3')?.querySelector('.form-label, .form-check-label')?.textContent?.trim() || el.dataset.key;
+    const label = el.closest('.t-field')?.querySelector('.t-label, .t-check-label')?.textContent?.trim() || el.dataset.key;
     switch (el.dataset.kind) {
       case 'bool': return { value: el.checked ? 'true' : 'false' };
       case 'rules': return serializeRules(el);
@@ -167,8 +167,10 @@
   function showPane(id) {
     const panes = [...document.querySelectorAll('.settings-pane')];
     if (!panes.some((p) => p.dataset.pane === id)) id = panes[0].dataset.pane;
-    panes.forEach((p) => p.classList.toggle('d-none', p.dataset.pane !== id));
-    document.querySelectorAll('.settings-sidebar .sidebar-item').forEach((b) => b.classList.toggle('active', b.dataset.pane === id));
+    panes.forEach((p) => { p.hidden = p.dataset.pane !== id; });
+    document.querySelectorAll('.settings-sidebar .t-sidebar-item').forEach((b) => {
+      if (b.dataset.pane === id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
     history.replaceState(null, '', `#${id}`);
   }
 
@@ -176,18 +178,18 @@
     try {
       const { settings } = await MS.getJSON('/api/settings');
       fill(settings || {});
-      $('settings-error').classList.add('d-none');
+      $('settings-error').hidden = true;
     } catch (e) {
       const box = $('settings-error');
-      box.classList.remove('d-none');
-      box.innerHTML = `<div class="alert alert-danger d-flex align-items-center gap-2"><i class="bi bi-exclamation-triangle"></i><span>Could not load settings: ${esc(e.message)}</span></div>`;
+      box.hidden = false;
+      box.innerHTML = `<div class="t-alert" data-tone="danger" role="alert"><i class="t-icon t-alert-icon bi bi-exclamation-triangle" aria-hidden="true"></i><div class="t-alert-body">Could not load settings: ${esc(e.message)}</div></div>`;
       document.querySelectorAll('.settings-pane [type="submit"]').forEach((b) => { b.disabled = true; });
     }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.rules-editor').forEach((ed) => { renderRules(ed, []); wireRules(ed); });
-    document.querySelectorAll('.settings-sidebar .sidebar-item').forEach((b) => b.addEventListener('click', () => showPane(b.dataset.pane)));
+    document.querySelectorAll('.settings-sidebar .t-sidebar-item').forEach((b) => b.addEventListener('click', () => showPane(b.dataset.pane)));
     showPane(location.hash.slice(1));
 
     document.querySelectorAll('.settings-pane').forEach((form) => form.addEventListener('submit', (ev) => { ev.preventDefault(); savePane(form); }));

@@ -1,17 +1,14 @@
 <div class="explorer-toolbar">
   <form id="search-form" class="search-form" autocomplete="off">
-    <div class="input-group input-group-sm">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input id="search-q" class="form-control" type="search" placeholder="Search payloads…" aria-label="Search payloads">
-      <button class="btn btn-outline-secondary" type="submit">Search</button>
+    <div class="t-input-group" data-size="sm">
+      <span class="t-input-addon"><i class="bi bi-search" aria-hidden="true"></i></span>
+      <input id="search-q" class="t-input" type="search" placeholder="Search payloads…" aria-label="Search payloads">
+      <button class="t-btn" type="submit">Search</button>
     </div>
-    <div class="form-check form-check-inline small mb-0 text-nowrap">
-      <input class="form-check-input" type="checkbox" id="search-scope">
-      <label class="form-check-label" for="search-scope">this topic only</label>
-    </div>
+    <label class="t-check t-small t-nowrap"><input class="t-check-input" type="checkbox" id="search-scope"><span class="t-check-label">this topic only</span></label>
   </form>
-  <div class="toolbar-controls">
-    <select id="range" class="form-select form-select-sm range-select" aria-label="Time range">
+  <div class="t-toolbar toolbar-controls">
+    <select id="range" class="t-select range-select" data-size="sm" aria-label="Time range">
       <option value="15m">Last 15 min</option>
       <option value="1h">Last hour</option>
       <option value="6h">Last 6 hours</option>
@@ -19,17 +16,17 @@
       <option value="7d">Last 7 days</option>
       <option value="custom">Custom…</option>
     </select>
-    <div id="custom-range" class="custom-range d-none">
-      <input id="range-from" type="datetime-local" class="form-control form-control-sm" aria-label="From">
-      <span class="text-muted">→</span>
-      <input id="range-to" type="datetime-local" class="form-control form-control-sm" aria-label="To">
-      <button id="range-apply" class="btn btn-sm btn-outline-secondary" type="button">Apply</button>
+    <div id="custom-range" class="custom-range" hidden>
+      <input id="range-from" type="datetime-local" class="t-input" data-size="sm" aria-label="From">
+      <span class="t-muted">→</span>
+      <input id="range-to" type="datetime-local" class="t-input" data-size="sm" aria-label="To">
+      <button id="range-apply" class="t-btn" data-size="sm" type="button">Apply</button>
     </div>
-    <button id="pause-btn" class="btn btn-sm btn-outline-secondary" type="button" title="Pause live updates">
-      <i class="bi bi-pause-fill"></i><span class="ms-1">Pause</span>
+    <button id="pause-btn" class="t-btn" data-size="sm" type="button" aria-pressed="false" title="Pause live updates">
+      <i class="t-icon bi bi-pause-fill" aria-hidden="true"></i><span>Pause</span>
     </button>
-    <button id="publish-btn" class="btn btn-sm btn-primary d-none" type="button" title="Publish a message">
-      <i class="bi bi-send me-1"></i>Publish
+    <button id="publish-btn" class="t-btn" data-variant="primary" data-size="sm" type="button" title="Publish a message" hidden>
+      <i class="t-icon bi bi-send" aria-hidden="true"></i>Publish
     </button>
   </div>
 </div>
@@ -37,11 +34,11 @@
 <div class="explorer">
   <section class="pane pane-tree" aria-label="Topics">
     <div class="pane-head">
-      <div class="input-group input-group-sm">
-        <span class="input-group-text"><i class="bi bi-funnel"></i></span>
-        <input id="topic-filter" data-hotkey="/" class="form-control" type="search" placeholder="Filter topics: text or glob (+ # *)" aria-label="Filter topics">
+      <div class="t-input-group" data-size="sm">
+        <span class="t-input-addon"><i class="bi bi-funnel" aria-hidden="true"></i></span>
+        <input id="topic-filter" data-hotkey="/" class="t-input" type="search" placeholder="Filter topics: text or glob (+ # *)" aria-label="Filter topics">
       </div>
-      <button id="tree-collapse" class="btn btn-sm btn-icon" type="button" title="Collapse all"><i class="bi bi-arrows-collapse"></i></button>
+      <button id="tree-collapse" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Collapse all" aria-label="Collapse all"><i class="bi bi-arrows-collapse"></i></button>
     </div>
     <div class="pane-sub"><span id="topic-count">Loading topics…</span></div>
     <div id="tree" class="pane-body tree-body"></div>
@@ -49,92 +46,85 @@
 
   <section class="pane pane-timeline" aria-label="Timeline">
     <div class="pane-head pane-head-stack">
-      <div id="tl-title" class="pane-title text-muted">No topic selected</div>
+      <div id="tl-title" class="pane-title t-muted">No topic selected</div>
       <div id="tl-meta" class="pane-meta"></div>
     </div>
     <div id="timeline" class="pane-body timeline-body"></div>
     <div class="pane-foot">
-      <span id="tl-status" class="small text-muted"></span>
-      <button id="load-more" class="btn btn-sm btn-outline-secondary d-none" type="button"><i class="bi bi-chevron-double-down me-1"></i>Load more</button>
+      <span id="tl-status" class="t-small t-muted"></span>
+      <button id="load-more" class="t-btn" data-size="sm" type="button" hidden><i class="t-icon bi bi-chevron-double-down" aria-hidden="true"></i>Load more</button>
     </div>
   </section>
 
   <section class="pane pane-detail" aria-label="Message detail">
     <div class="pane-head">
-      <div class="pane-tabs" role="tablist">
-        <button class="pane-tab active" type="button" data-tab="payload"><i class="bi bi-braces me-1"></i>Payload</button>
-        <button class="pane-tab" type="button" data-tab="diff"><i class="bi bi-file-diff me-1"></i>Diff</button>
-        <button class="pane-tab" type="button" data-tab="chart"><i class="bi bi-graph-up me-1"></i>Chart</button>
+      <div class="t-tabs pane-tabs" data-variant="underline">
+        <div class="t-tabs-list" role="tablist">
+          <button class="t-tab" role="tab" type="button" data-tab="payload" id="tab-btn-payload" aria-controls="tab-payload" aria-selected="true"><i class="t-icon bi bi-braces" aria-hidden="true"></i>Payload</button>
+          <button class="t-tab" role="tab" type="button" data-tab="diff" id="tab-btn-diff" aria-controls="tab-diff" aria-selected="false" tabindex="-1"><i class="t-icon bi bi-file-diff" aria-hidden="true"></i>Diff</button>
+          <button class="t-tab" role="tab" type="button" data-tab="chart" id="tab-btn-chart" aria-controls="tab-chart" aria-selected="false" tabindex="-1"><i class="t-icon bi bi-graph-up" aria-hidden="true"></i>Chart</button>
+        </div>
       </div>
-      <button id="copy-btn" class="btn btn-sm btn-icon ms-auto d-none" type="button" title="Copy payload"><i class="bi bi-clipboard"></i></button>
+      <button id="copy-btn" class="t-btn pane-head-end" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Copy payload" aria-label="Copy payload" hidden><i class="bi bi-clipboard"></i></button>
     </div>
-    <div id="detail-meta" class="detail-meta d-none"></div>
-    <div id="tab-payload" class="pane-body detail-body"></div>
-    <div id="tab-diff" class="pane-body detail-body d-none"></div>
-    <div id="tab-chart" class="pane-body detail-body d-none">
+    <div id="detail-meta" class="detail-meta" hidden></div>
+    <div id="tab-payload" class="pane-body detail-body" role="tabpanel" aria-labelledby="tab-btn-payload"></div>
+    <div id="tab-diff" class="pane-body detail-body" role="tabpanel" aria-labelledby="tab-btn-diff" hidden></div>
+    <div id="tab-chart" class="pane-body detail-body" role="tabpanel" aria-labelledby="tab-btn-chart" hidden>
       <div class="chart-controls">
-        <select id="chart-path" class="form-select form-select-sm" aria-label="Numeric path"></select>
-        <button id="chart-reload" class="btn btn-sm btn-icon" type="button" title="Reload series"><i class="bi bi-arrow-clockwise"></i></button>
+        <select id="chart-path" class="t-select" data-size="sm" aria-label="Numeric path"></select>
+        <button id="chart-reload" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Reload series" aria-label="Reload series"><i class="bi bi-arrow-clockwise"></i></button>
       </div>
-      <div id="chart-empty" class="d-none"></div>
+      <div id="chart-empty" hidden></div>
       <div id="chart-box" class="chart-box"></div>
     </div>
   </section>
 </div>
 
-<div class="modal fade" id="publish-modal" tabindex="-1" aria-labelledby="publish-title" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <form class="modal-content" id="publish-form" autocomplete="off">
-      <div class="modal-header">
-        <h5 class="modal-title" id="publish-title"><i class="bi bi-send me-2"></i>Publish a message</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<dialog class="t-dialog" id="publish-modal" data-size="lg" aria-labelledby="publish-title">
+  <form id="publish-form" autocomplete="off">
+    <div class="t-dialog-header">
+      <h2 class="t-dialog-title" id="publish-title"><i class="t-icon bi bi-send" aria-hidden="true"></i>Publish a message</h2>
+      <button type="button" class="t-dialog-close" data-dialog-close aria-label="Close">×</button>
+    </div>
+    <div class="t-dialog-body t-stack">
+      <div class="t-field">
+        <label class="t-label" for="pub-topic">Topic</label>
+        <input id="pub-topic" class="t-input t-mono" type="text" required placeholder="home/livingroom/lamp/set">
+        <p class="t-hint">No wildcards (<code>+</code>, <code>#</code>).</p>
       </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label class="form-label" for="pub-topic">Topic</label>
-          <input id="pub-topic" class="form-control font-monospace" type="text" required placeholder="home/livingroom/lamp/set">
-          <div class="form-text">No wildcards (<code>+</code>, <code>#</code>).</div>
+      <div class="t-field">
+        <label class="t-label" for="pub-payload">Payload</label>
+        <textarea id="pub-payload" class="t-textarea t-mono auto-rows" rows="6" placeholder='{"on": true}'></textarea>
+        <p id="pub-hint" class="t-hint"></p>
+      </div>
+      <div class="t-cluster" data-gap="4">
+        <label class="t-check" data-variant="switch"><input class="t-check-input" type="checkbox" role="switch" id="pub-retain"><span class="t-check-label">Retain</span></label>
+        <div class="t-cluster" data-gap="2">
+          <label class="t-label" for="pub-qos">QoS</label>
+          <select id="pub-qos" class="t-select qos-select" data-size="sm">
+            <option value="0">0 · at most once</option>
+            <option value="1">1 · at least once</option>
+            <option value="2">2 · exactly once</option>
+          </select>
         </div>
-        <div class="mb-3">
-          <label class="form-label" for="pub-payload">Payload</label>
-          <textarea id="pub-payload" class="form-control font-monospace auto-rows" rows="6" placeholder='{"on": true}'></textarea>
-          <div id="pub-hint" class="form-text"></div>
-        </div>
-        <div class="d-flex flex-wrap align-items-center gap-4">
-          <div class="form-check form-switch mb-0">
-            <input class="form-check-input" type="checkbox" id="pub-retain">
-            <label class="form-check-label" for="pub-retain">Retain</label>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <label class="form-label mb-0" for="pub-qos">QoS</label>
-            <select id="pub-qos" class="form-select form-select-sm qos-select">
-              <option value="0">0 · at most once</option>
-              <option value="1">1 · at least once</option>
-              <option value="2">2 · exactly once</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <span id="pub-confirm-text" class="me-auto small text-warning d-none"></span>
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" id="pub-submit" class="btn btn-primary"><i class="bi bi-send me-1"></i>Publish</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal fade" id="search-modal" tabindex="-1" aria-labelledby="search-title" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="search-title"><i class="bi bi-search me-2"></i>Search results</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body p-0">
-        <div id="search-summary" class="search-summary"></div>
-        <div id="search-results" class="search-results"></div>
       </div>
     </div>
+    <div class="t-dialog-footer">
+      <span id="pub-confirm-text" class="t-small t-tone-text pub-confirm-text" data-tone="warning" hidden></span>
+      <button type="button" class="t-btn" data-dialog-close>Cancel</button>
+      <button type="submit" id="pub-submit" class="t-btn" data-variant="primary"><i class="t-icon bi bi-send" aria-hidden="true"></i>Publish</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="t-dialog search-dialog" id="search-modal" data-size="lg" aria-labelledby="search-title">
+  <div class="t-dialog-header">
+    <h2 class="t-dialog-title" id="search-title"><i class="t-icon bi bi-search" aria-hidden="true"></i>Search results</h2>
+    <button type="button" class="t-dialog-close" data-dialog-close aria-label="Close">×</button>
   </div>
-</div>
+  <div class="t-dialog-body search-dialog-body">
+    <div id="search-summary" class="search-summary"></div>
+    <div id="search-results" class="search-results"></div>
+  </div>
+</dialog>

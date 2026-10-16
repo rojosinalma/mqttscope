@@ -1,4 +1,4 @@
-/* mqttscope shared helpers: escaping, formatting, fetch, toasts, SSE stream, connection indicator, charts. */
+/* mqttscope shared helpers: escaping, formatting, fetch, toasts (Tailor.toast), SSE stream, connection indicator, charts. */
 (function () {
   'use strict';
 
@@ -69,18 +69,14 @@
     return `${(r * 60).toFixed(1)}/min`;
   };
 
-  // ─── Toasts ─────────────────────────────────────────────
-  const TOAST_ICONS = { success: 'check-circle-fill', warning: 'exclamation-triangle-fill', error: 'x-circle-fill' };
+  // ─── Toasts (Tailor.toast; queued until tailor.js is up) ─
+  const TOAST_MS = 2500;
+  const toastQueue = [];
   MS.toast = (type, msg) => {
-    const box = document.getElementById('toast-container');
-    if (!box) return;
-    const el = document.createElement('div');
-    el.className = `toast-item toast-${type}`;
-    el.innerHTML = `<i class="bi bi-${TOAST_ICONS[type] || TOAST_ICONS.error}"></i><span></span>`;
-    el.querySelector('span').textContent = msg;
-    box.appendChild(el);
-    setTimeout(() => { el.classList.add('leaving'); setTimeout(() => el.remove(), 300); }, 2500);
+    if (!window.Tailor) { toastQueue.push([type, msg]); return; }
+    Tailor.toast(type === 'error' ? 'danger' : type, msg, { timeout: TOAST_MS });
   };
+  const flushToasts = () => { while (window.Tailor && toastQueue.length) MS.toast(...toastQueue.shift()); };
   MS.toastResult = (res) => MS.toast(res.ok ? 'success' : 'error', res.message || (res.ok ? 'Done' : 'Failed'));
 
   // ─── Fetch ──────────────────────────────────────────────
@@ -132,21 +128,23 @@
     if (!btn) return fn();
     const html = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>${html}`;
-    try { return await fn(); } finally { btn.disabled = false; btn.innerHTML = html; }
+    btn.setAttribute('aria-busy', 'true');
+    btn.innerHTML = `<span class="t-spinner" data-size="sm" aria-hidden="true"></span>${html}`;
+    try { return await fn(); } finally { btn.disabled = false; btn.removeAttribute('aria-busy'); btn.innerHTML = html; }
   };
 
   MS.empty = (icon, text, hint, compact = true) =>
-    `<div class="empty-state${compact ? ' compact' : ''}"><i class="bi ${icon}"></i>${MS.esc(text)}${hint ? `<div class="empty-hint">${MS.esc(hint)}</div>` : ''}</div>`;
+    `<div class="t-empty"${compact ? ' data-size="sm"' : ''}><i class="t-icon t-empty-icon bi ${icon}" aria-hidden="true"></i><div class="t-empty-title">${MS.esc(text)}</div>${hint ? `<p>${MS.esc(hint)}</p>` : ''}</div>`;
+  MS.loading = () => '<div class="t-empty" data-size="sm"><span class="t-spinner" data-size="sm" role="status" aria-label="Loading"></span></div>';
 
-  // ─── Theme ──────────────────────────────────────────────
-  MS.toggleTheme = () => {
-    const t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', t);
-    localStorage.setItem('theme', t);
-    document.dispatchEvent(new CustomEvent('ms:theme', { detail: t }));
+  // ─── Theme (tailor owns skin/palette/mode; charts re-render when <html> data-* change) ──
+  const TOKENS = { fg: 'text', comment: 'muted', selection: 'border', purple: 'hue-purple', green: 'hue-green', cyan: 'hue-cyan', orange: 'hue-orange', pink: 'hue-pink', red: 'hue-red', yellow: 'hue-yellow' };
+  MS.color = (name) => {
+    const css = getComputedStyle(document.documentElement);
+    return css.getPropertyValue(`--t-${TOKENS[name] || name}`).trim() || css.getPropertyValue('--t-accent').trim();
   };
-  MS.color = (name) => getComputedStyle(document.documentElement).getPropertyValue(`--drac-${name}`).trim() || '#BD93F9';
+  new MutationObserver(() => document.dispatchEvent(new CustomEvent('ms:theme')))
+    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-skin', 'data-palette', 'data-mode'] });
 
   // ─── Broker connection indicator + banner ───────────────
   const conn = { broker: null, error: null, host: null, stream: 'idle' };
@@ -155,29 +153,29 @@
   function renderConn() {
     const ind = document.getElementById('conn-indicator');
     if (!ind) return;
-    const dot = ind.querySelector('.status-dot');
+    const dot = ind.querySelector('.t-dot');
     const label = document.getElementById('conn-label');
-    let cls = 'status-dot--muted';
+    let status = 'muted';
     let text = 'broker';
     let title = 'Broker connection: unknown';
     if (conn.broker === true) {
-      cls = 'status-dot--ok'; text = 'connected';
+      status = 'running'; text = 'connected';
       title = `Connected to ${conn.host || 'broker'}`;
     } else if (conn.broker === false) {
-      cls = 'status-dot--down'; text = 'disconnected';
+      status = 'stopped'; text = 'disconnected';
       title = `Disconnected from ${conn.host || 'broker'}${conn.error ? `: ${conn.error}` : ''}`;
     }
     if (conn.stream === 'lost' && conn.broker !== false) {
-      cls = 'status-dot--warn'; text = 'stream lost';
+      status = 'degraded'; text = 'stream lost';
       title = 'Live stream to mqttscope interrupted; reconnecting…';
     }
-    dot.className = `bi bi-circle-fill status-dot ${cls}`;
+    dot.dataset.status = status;
     label.textContent = text;
     ind.title = title;
 
     const banner = document.getElementById('conn-banner');
     if (banner) {
-      banner.classList.toggle('d-none', conn.broker !== false);
+      banner.hidden = conn.broker !== false;
       const detail = document.getElementById('conn-banner-detail');
       detail.textContent = `${conn.host ? `${conn.host} · ` : ''}${conn.error ? `${conn.error}. ` : ''}Live data is paused; stored history is still available.`;
     }
@@ -287,7 +285,7 @@
     return [xs, ys];
   };
 
-  // A themed line chart that resizes with its box and rebuilds on theme change.
+  // A themed line chart that resizes with its box and rebuilds on skin/palette/mode change.
   MS.chart = (el, { data, label = 'value', color = 'purple', height = 220, spark = false, fmt } = {}) => {
     if (!window.uPlot) {
       el.innerHTML = MS.empty('bi-exclamation-triangle', 'Chart library failed to load (cdn.jsdelivr.net).');
@@ -352,13 +350,13 @@
 
   // ─── Boot ───────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('theme-toggle')?.addEventListener('click', MS.toggleTheme);
+    flushToasts();
 
     document.getElementById('conn-banner-reconnect')?.addEventListener('click', (e) =>
       MS.busy(e.currentTarget, async () => MS.toastResult(await MS.postAction('/api/reconnect')))
     );
 
-    // `/` focuses the page's search/filter; Escape closes any open modal.
+    // `/` focuses the page's search/filter; Escape closes any open dialog (native dialogs do this themselves).
     document.addEventListener('keydown', (e) => {
       const tag = (e.target.tagName || '').toLowerCase();
       const typing = ['input', 'textarea', 'select'].includes(tag) || e.target.isContentEditable;
@@ -366,7 +364,7 @@
         const target = document.querySelector('[data-hotkey="/"]');
         if (target) { e.preventDefault(); target.focus(); target.select?.(); }
       } else if (e.key === 'Escape') {
-        document.querySelectorAll('.modal.show').forEach((m) => bootstrap.Modal.getInstance(m)?.hide());
+        document.querySelectorAll('dialog[open]').forEach((d) => d.close());
         if (typing && e.target.matches('[data-hotkey="/"]')) e.target.blur();
       }
     });
