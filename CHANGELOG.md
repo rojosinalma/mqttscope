@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-16
+
+### Changed
+
+- Licence changed from MIT to AGPL-3.0.
+- The container runs as a non-root user (uid 1000) and carries a `HEALTHCHECK` against `/api/stats`.
+  Upgrading: the mounted `data/` directory must be writable by uid 1000 (`chown -R 1000 data`, or set
+  `user:` in your compose file to the uid that owns it).
+- README restructured (badges, requirements with minimum versions, installation, usage, development).
+
+### Added
+
+- `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue and pull request templates, Dependabot for Bundler,
+  GitHub Actions and the base image.
+
 ## [0.2.0] - 2026-10-16
 
 ### Added
@@ -31,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Retention by age (`retention_days`) and database size (`max_db_bytes`).
 - Docker Compose quick start.
 
-[Unreleased]: https://github.com/rojosinalma/mqttscope/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/rojosinalma/mqttscope/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/rojosinalma/mqttscope/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/rojosinalma/mqttscope/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/rojosinalma/mqttscope/releases/tag/v0.1.0
