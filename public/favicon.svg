@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img">
-  <!-- palette: dracula · canvas #282a36 · accent #bd93f9 · secondary #8be9fd · glyph lucide:radio -->
+  <!-- palette: gruvbox · canvas #282828 · accent #fabd2f · secondary #8ec07c · glyph lucide:radio -->
   <title>mqttscope</title>
-  <rect width="32" height="32" rx="6" fill="#282a36"/>
-  <g transform="translate(4 4)" fill="none" stroke="#bd93f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="32" height="32" rx="6" fill="#282828"/>
+  <g transform="translate(4 4)" fill="none" stroke="#fabd2f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M16.247 7.761a6 6 0 0 1 0 8.478m2.828-11.306a10 10 0 0 1 0 14.134m-14.15 0a10 10 0 0 1 0-14.134m2.828 11.306a6 6 0 0 1 0-8.478"/>
-    <circle cx="12" cy="12" r="2.5" fill="#8be9fd" stroke="none"/>
+    <circle cx="12" cy="12" r="2.5" fill="#8ec07c" stroke="none"/>
   </g>
 </svg>
