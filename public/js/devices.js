@@ -52,8 +52,8 @@
       wrap.hidden = true;
       empty.hidden = false;
       empty.innerHTML = state.devices.length
-        ? MS.empty('bi-funnel', 'No devices match the filter.', null, false)
-        : MS.empty('bi-cpu', 'No devices detected yet.', 'Devices come from the presence rules in Settings → Presence, matched against live topics.', false);
+        ? MS.empty('funnel', 'No devices match the filter.', null, false)
+        : MS.empty('cpu', 'No devices detected yet.', 'Devices come from the presence rules in Settings → Presence, matched against live topics.', false);
       return;
     }
     empty.hidden = true;
@@ -72,7 +72,7 @@
         + `<td title="${esc(MS.fmtISO(d.last_seen_ms))}">${esc(MS.fmtRel(d.last_seen_ms))}</td>`
         + `<td title="${esc(MS.fmtISO(d.since_ms))}">${esc(d.since_ms ? MS.fmtRel(d.since_ms) : '—')}</td>`
         + `<td class="t-col-icon">${d.stale ? '<span class="t-badge" data-tone="orange" title="Not seen within the rule\'s stale_s">stale</span>' : `<span class="t-badge" data-tone="${d.online ? 'success' : 'danger'}">${st.text}</span>`}</td>`
-        + `<td class="t-col-icon"><button class="t-btn expand-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-expand="${esc(k)}" aria-expanded="${open}" title="Show fields" aria-label="Show fields"><i class="bi bi-chevron-right"></i></button></td>`
+        + `<td class="t-col-icon"><button class="t-btn expand-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-expand="${esc(k)}" aria-expanded="${open}" title="Show fields" aria-label="Show fields">${MS.icon('chevron-right')}</button></td>`
         + '</tr>';
       const fields = open ? `<tr class="fields-row"><td colspan="8">${fieldsHTML(d.fields)}</td></tr>` : '';
       return row + fields;
@@ -91,7 +91,7 @@
       if (!state.loadedOnce) {
         $('devices-wrap').hidden = true;
         $('devices-empty').hidden = false;
-        $('devices-empty').innerHTML = MS.empty('bi-exclamation-triangle', `Could not load devices: ${e.message}`, null, false);
+        $('devices-empty').innerHTML = MS.empty('exclamation-triangle', `Could not load devices: ${e.message}`, null, false);
       } else {
         MS.toast('error', `Could not refresh devices: ${e.message}`);
       }
@@ -137,7 +137,7 @@
       if (!known.length) {
         $('timeline-wrap').hidden = true;
         $('timeline-empty').hidden = false;
-        $('timeline-empty').innerHTML = MS.empty('bi-bar-chart-steps', 'No presence history in this range.', 'History builds from stored status messages.');
+        $('timeline-empty').innerHTML = MS.empty('bar-chart-steps', 'No presence history in this range.', 'History builds from stored status messages.');
         $('timeline-uptime').textContent = '';
         return;
       }
@@ -162,7 +162,7 @@
     } catch (e) {
       $('timeline-wrap').hidden = true;
       $('timeline-empty').hidden = false;
-      $('timeline-empty').innerHTML = MS.empty('bi-exclamation-triangle', `Could not load the timeline: ${e.message}`);
+      $('timeline-empty').innerHTML = MS.empty('exclamation-triangle', `Could not load the timeline: ${e.message}`);
     }
   }
 

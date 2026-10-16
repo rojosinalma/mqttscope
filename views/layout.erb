@@ -1,10 +1,10 @@
 <% page_title = (defined?(title) && title) || "mqttscope" -%>
 <% current = defined?(nav) ? nav : nil -%>
 <% tabs = [
-     ["explorer", "/",         "bi-diagram-3",    "Explorer"],
-     ["stats",    "/stats",    "bi-speedometer2", "Stats"],
-     ["devices",  "/devices",  "bi-cpu",          "Devices"],
-     ["settings", "/settings", "bi-sliders",      "Settings"]
+     ["explorer", "/",         "diagram-3",    "Explorer"],
+     ["stats",    "/stats",    "speedometer2", "Stats"],
+     ["devices",  "/devices",  "cpu",          "Devices"],
+     ["settings", "/settings", "sliders",      "Settings"]
    ] -%>
 <% page_script = tabs.map(&:first).include?(current) ? current : nil -%>
 <% charts = %w[explorer stats].include?(current) -%>
@@ -17,7 +17,6 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <%# tailor head (vendored public/tailor/tailor-head.html, kept current by `tailor sync`) %>
   <%== File.read(File.join(Dir.pwd, "public/tailor/tailor-head.html")) %>
-  <link href="/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
 <% if charts -%>
   <link href="https://cdn.jsdelivr.net/npm/uplot@1.6.30/dist/uPlot.min.css" rel="stylesheet">
 <% end -%>
@@ -26,22 +25,22 @@
 <body>
 <div class="t-shell" data-sidebar="none">
   <header class="t-navbar t-shell-nav app-navbar">
-    <a class="t-navbar-brand" href="/"><i class="t-icon bi bi-broadcast" aria-hidden="true"></i>mqttscope</a>
+    <a class="t-navbar-brand" href="/"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-broadcast"/></svg>mqttscope</a>
     <span id="conn-indicator" class="conn-indicator" title="Broker connection: checking…">
       <span class="t-dot" data-status="muted"></span><span id="conn-label">broker</span>
     </span>
     <ul class="t-navbar-nav">
 <% tabs.each do |key, href, icon, label| -%>
-      <li><a class="t-navbar-link"<%= ' aria-current="page"' if current == key %> href="<%= href %>"><i class="t-icon bi <%= icon %>" aria-hidden="true"></i><span class="nav-label"><%= label %></span></a></li>
+      <li><a class="t-navbar-link"<%= ' aria-current="page"' if current == key %> href="<%= href %>"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-<%= icon %>"/></svg><span class="nav-label"><%= label %></span></a></li>
 <% end -%>
     </ul>
   </header>
 
   <main class="t-shell-main t-page main-content<%= " main-fill" if current == "explorer" %>">
     <div id="conn-banner" class="t-alert conn-banner" data-tone="danger" role="alert" hidden>
-      <i class="t-icon t-alert-icon bi bi-plug-fill" aria-hidden="true"></i>
+      <svg class="t-icon t-alert-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-plug-fill"/></svg>
       <div class="t-alert-body"><b>Broker disconnected.</b> <span id="conn-banner-detail">Live data is paused; stored history is still available.</span></div>
-      <div class="t-alert-actions"><button id="conn-banner-reconnect" class="t-btn" data-size="sm" data-tone="danger" type="button"><i class="t-icon bi bi-arrow-repeat" aria-hidden="true"></i>Reconnect</button></div>
+      <div class="t-alert-actions"><button id="conn-banner-reconnect" class="t-btn" data-size="sm" data-tone="danger" type="button"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-arrow-repeat"/></svg>Reconnect</button></div>
     </div>
 <%== yield %>
   </main>

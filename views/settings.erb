@@ -2,7 +2,7 @@
   number = ->(key, label, help = nil, unit: nil, min: 0) { { key: key, label: label, help: help, unit: unit, min: min, kind: "int" } }
   text = ->(key, label, help = nil, placeholder: nil) { { key: key, label: label, help: help, placeholder: placeholder, kind: "text" } }
   panes = [
-    ["broker", "bi-hdd-network", "Broker", [
+    ["broker", "hdd-network", "Broker", [
       ["Connection", [
         text.("mqtt_host", "Host", "Hostname or IP of the MQTT broker."),
         number.("mqtt_port", "Port", nil, min: 1),
@@ -16,7 +16,7 @@
         text.("reconnect_backoff_s", "Reconnect backoff", "Comma-separated seconds between attempts; the last one repeats.", placeholder: "2,5,10,30,60")
       ]]
     ]],
-    ["storage", "bi-database", "Storage", [
+    ["storage", "database", "Storage", [
       ["Sampling", [
         { key: "dedup_enabled", label: "Drop consecutive identical payloads", kind: "bool", help: "Repeats bump the stored row's ×N counter instead of adding rows." },
         number.("default_min_interval_ms", "Default min interval", "Store at most one message per topic per interval.", unit: "ms"),
@@ -30,7 +30,7 @@
         number.("prune_batch", "Prune batch", "Rows per delete batch.", unit: "rows", min: 1)
       ]]
     ]],
-    ["streams", "bi-broadcast-pin", "Streams", [
+    ["streams", "broadcast-pin", "Streams", [
       ["Live streams (SSE)", [
         number.("sse_max_clients", "Max clients", "Browser tabs that can stream at once.", min: 1),
         number.("sse_idle_timeout_s", "Idle timeout", "Close a stream that had no events this long.", unit: "s", min: 10),
@@ -44,12 +44,12 @@
         number.("search_default_limit", "Search result limit", nil, unit: "rows", min: 1)
       ]]
     ]],
-    ["presence", "bi-wifi", "Presence", [
+    ["presence", "wifi", "Presence", [
       ["Presence rules", [
         { key: "presence_rules", label: "Rules", kind: "rules", help: "A device is online when online_path is truthy in its last payload and it was seen within stale_s. id_segment is the 0-based topic segment holding the device id." }
       ]]
     ]],
-    ["publishing", "bi-send", "Publishing", [
+    ["publishing", "send", "Publishing", [
       ["Publishing", [
         { key: "publish_enabled", label: "Allow publishing from the explorer", kind: "bool", help: "UI publishes are stored with origin “ui”." }
       ]]
@@ -57,7 +57,7 @@
   ]
 -%>
 <header class="t-page-header">
-  <h1 class="t-page-title"><i class="t-icon bi bi-sliders" aria-hidden="true"></i>Settings</h1>
+  <h1 class="t-page-title"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-sliders"/></svg>Settings</h1>
 </header>
 
 <div id="settings-error" hidden></div>
@@ -66,7 +66,7 @@
   <nav class="t-sidebar settings-sidebar" aria-label="Settings sections">
     <ul>
 <% panes.each_with_index do |(id, icon, label, _), i| -%>
-      <li><button class="t-sidebar-item"<%= ' aria-current="page"' if i.zero? %> type="button" data-pane="<%= id %>"><i class="t-icon bi <%= icon %>" aria-hidden="true"></i><span class="t-sidebar-item-name"><%= label %></span></button></li>
+      <li><button class="t-sidebar-item"<%= ' aria-current="page"' if i.zero? %> type="button" data-pane="<%= id %>"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-<%= icon %>"/></svg><span class="t-sidebar-item-name"><%= label %></span></button></li>
 <% end -%>
     </ul>
   </nav>
@@ -102,7 +102,7 @@
           <div class="t-input-group">
 <% if f[:kind] == "secret" -%>
             <input class="t-input" type="password" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="secret" autocomplete="new-password">
-            <button class="t-btn secret-toggle" type="button" data-target="<%= fid %>" title="Show / hide" aria-label="Show / hide"><i class="bi bi-eye"></i></button>
+            <button class="t-btn secret-toggle" type="button" data-target="<%= fid %>" title="Show / hide" aria-label="Show / hide"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-eye"/></svg></button>
 <% elsif f[:kind] == "gb" -%>
             <input class="t-input" type="number" min="0.1" step="0.1" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="gb">
 <% elsif f[:kind] == "int" -%>
@@ -139,9 +139,9 @@
       </section>
 <% end -%>
       <div class="t-toolbar settings-actions">
-        <button class="t-btn" data-variant="primary" type="submit"><i class="t-icon bi bi-check-lg" aria-hidden="true"></i>Save <%= label.downcase %></button>
+        <button class="t-btn" data-variant="primary" type="submit"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-check-lg"/></svg>Save <%= label.downcase %></button>
 <% if id == "broker" -%>
-        <button class="t-btn" type="button" id="reconnect-btn"><i class="t-icon bi bi-arrow-repeat" aria-hidden="true"></i>Reconnect</button>
+        <button class="t-btn" type="button" id="reconnect-btn"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-arrow-repeat"/></svg>Reconnect</button>
 <% end -%>
       </div>
     </form>

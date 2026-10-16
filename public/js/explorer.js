@@ -231,8 +231,8 @@
       ? `${MS.fmtNum(entries.length)} of ${MS.fmtNum(all.length)} topics match`
       : `${MS.fmtNum(all.length)} topics`;
 
-    if (!all.length) { box.innerHTML = MS.empty('bi-hourglass-split', 'No topics yet.', 'They appear here as soon as the broker delivers messages.'); S.rowEls.clear(); return; }
-    if (!entries.length) { box.innerHTML = MS.empty('bi-funnel', 'No topics match the filter.', 'Plain text matches anywhere; + * # and ? make it a glob.'); S.rowEls.clear(); return; }
+    if (!all.length) { box.innerHTML = MS.empty('hourglass-split', 'No topics yet.', 'They appear here as soon as the broker delivers messages.'); S.rowEls.clear(); return; }
+    if (!entries.length) { box.innerHTML = MS.empty('funnel', 'No topics match the filter.', 'Plain text matches anywhere; + * # and ? make it a glob.'); S.rowEls.clear(); return; }
 
     const root = buildTree(entries);
     const needle = matcher?.substring;
@@ -257,7 +257,7 @@
       if (e && S.selected === node.path) cls.push('selected');
       const name = node.name === '' ? '(empty)' : node.name;
       let html = `<div class="${cls.join(' ')}" data-path="${esc(node.path)}"${e ? ` data-topic="${esc(node.path)}"` : ''} title="${esc(node.path)}">`
-        + `<i class="bi bi-chevron-right tree-toggle${kids ? (open ? ' open' : '') : ' leaf'}"></i>`
+        + `${MS.icon('chevron-right', `tree-toggle${kids ? (open ? ' open' : '') : ' leaf'}`)}`
         + `<span class="tree-name">${highlightName(name, needle)}</span>`
         + `${e && e.preview !== null ? `<span class="tree-value">= ${esc(e.preview)}</span>` : ''}`
         + `<span class="tree-badges">${badgesHTML(node)}</span></div>`;
@@ -348,9 +348,9 @@
 
   function timelineEmpty() {
     const box = $('timeline');
-    if (!S.selected) { box.innerHTML = MS.empty('bi-diagram-3', 'Pick a topic on the left to see its messages.', null, false); return; }
+    if (!S.selected) { box.innerHTML = MS.empty('diagram-3', 'Pick a topic on the left to see its messages.', null, false); return; }
     const b = bounds();
-    box.innerHTML = MS.empty('bi-inbox', 'No stored messages in this range.',
+    box.innerHTML = MS.empty('inbox', 'No stored messages in this range.',
       b.live ? 'New messages show up here live. Sampling rules may keep busy topics sparse.' : 'Try a wider range.', false);
   }
 
@@ -419,7 +419,7 @@
       S.messages = [];
       S.byKey = new Map();
       S.hasMore = false;
-      $('timeline').innerHTML = MS.empty('bi-exclamation-triangle', `Could not load history: ${e.message}`, null, false);
+      $('timeline').innerHTML = MS.empty('exclamation-triangle', `Could not load history: ${e.message}`, null, false);
     } finally {
       renderTimelineStatus();
     }
@@ -566,7 +566,7 @@
   function renderPayload() {
     const box = $('tab-payload');
     const m = S.selectedMsg;
-    if (!m) { box.innerHTML = MS.empty('bi-cursor', S.selected ? 'Select a message in the timeline.' : 'Nothing selected.', null, false); return; }
+    if (!m) { box.innerHTML = MS.empty('cursor', S.selected ? 'Select a message in the timeline.' : 'Nothing selected.', null, false); return; }
     let kind;
     let body;
     if (m.binary) {
@@ -575,7 +575,7 @@
       body = dump ? `<pre class="payload hexdump">${esc(dump)}</pre>` : '';
     } else if (!m.payload) {
       kind = 'empty payload';
-      body = MS.empty('bi-dash-circle', 'Empty payload (0 bytes).');
+      body = MS.empty('dash-circle', 'Empty payload (0 bytes).');
     } else {
       const obj = parseJSONObject(m.payload);
       if (obj !== undefined) {
@@ -617,24 +617,24 @@
   function renderDiffResult(res) {
     const box = $('tab-diff');
     const d = res.diff;
-    if (!res.from) { box.innerHTML = MS.empty('bi-1-circle', 'First stored message on this topic — nothing to compare.', null, false); return; }
+    if (!res.from) { box.innerHTML = MS.empty('1-circle', 'First stored message on this topic — nothing to compare.', null, false); return; }
     const vs = `<span class="t-muted">vs ${esc(MS.fmtDateTime(res.from.ts_ms))}.${String(new Date(res.from.ts_ms).getMilliseconds()).padStart(3, '0')}${res.from.id !== undefined ? ` · #${esc(res.from.id)}` : ''}</span>`;
-    if (!d || d.kind === 'same') { box.innerHTML = `<div class="diff-summary">${vs}</div>${MS.empty('bi-check2-all', 'Identical to the previous stored message.')}`; return; }
+    if (!d || d.kind === 'same') { box.innerHTML = `<div class="diff-summary">${vs}</div>${MS.empty('check2-all', 'Identical to the previous stored message.')}`; return; }
     if (d.kind === 'binary') {
       box.innerHTML = `<div class="diff-summary">${esc(d.summary || 'Binary payloads differ')} ${vs}</div>`
-        + MS.empty('bi-file-binary', `Binary payloads differ (${MS.fmtBytes(res.from.size)} → ${MS.fmtBytes(res.to?.size ?? S.selectedMsg?.size)}).`);
+        + MS.empty('file-binary', `Binary payloads differ (${MS.fmtBytes(res.from.size)} → ${MS.fmtBytes(res.to?.size ?? S.selectedMsg?.size)}).`);
       return;
     }
     const changes = d.changes || [];
     box.innerHTML = `<div class="diff-summary">${esc(d.summary || `${changes.length} changes`)} ${vs}</div>`
-      + (changes.length ? `<div class="diff-list">${diffRowsHTML(d)}</div>` : MS.empty('bi-check2-all', 'No differences.'));
+      + (changes.length ? `<div class="diff-list">${diffRowsHTML(d)}</div>` : MS.empty('check2-all', 'No differences.'));
   }
 
   async function renderDiff() {
     const box = $('tab-diff');
     const m = S.selectedMsg;
-    if (!m) { box.innerHTML = MS.empty('bi-file-diff', 'Select a message to compare it with the previous one.', null, false); return; }
-    if (m.id === null) { box.innerHTML = MS.empty('bi-file-diff', 'This message was not stored, so it has no diff.', 'Diffs compare stored messages; sampling or dedup skipped this one.', false); return; }
+    if (!m) { box.innerHTML = MS.empty('file-diff', 'Select a message to compare it with the previous one.', null, false); return; }
+    if (m.id === null) { box.innerHTML = MS.empty('file-diff', 'This message was not stored, so it has no diff.', 'Diffs compare stored messages; sampling or dedup skipped this one.', false); return; }
     const cached = S.diffCache.get(m.id);
     if (cached) { renderDiffResult(cached); return; }
     box.innerHTML = MS.loading();
@@ -644,7 +644,7 @@
       if (S.diffCache.size > DIFF_CACHE_MAX) S.diffCache.delete(S.diffCache.keys().next().value);
       if (S.selectedMsg === m && S.tab === 'diff') renderDiffResult(res);
     } catch (e) {
-      if (S.selectedMsg === m) box.innerHTML = MS.empty('bi-exclamation-triangle', `Could not load the diff: ${e.message}`, null, false);
+      if (S.selectedMsg === m) box.innerHTML = MS.empty('exclamation-triangle', `Could not load the diff: ${e.message}`, null, false);
     }
   }
 
@@ -692,10 +692,10 @@
 
   async function renderChart(force = false) {
     const topic = S.selected;
-    if (!topic) { chartEmpty('bi-graph-up', 'Pick a topic to chart its numeric fields.'); return; }
+    if (!topic) { chartEmpty('graph-up', 'Pick a topic to chart its numeric fields.'); return; }
     if (force || S.chartTopic !== topic) await loadPaths();
     if (topic !== S.selected || S.tab !== 'chart') return;
-    if (!S.chartPaths.length) { chartEmpty('bi-graph-up', 'No numeric fields in the latest payload.', 'Charts need a number, or JSON with numeric values.'); return; }
+    if (!S.chartPaths.length) { chartEmpty('graph-up', 'No numeric fields in the latest payload.', 'Charts need a number, or JSON with numeric values.'); return; }
     const path = $('chart-path').value;
     const b = bounds();
     const box = $('chart-box');
@@ -705,7 +705,7 @@
       const res = await MS.getJSON(`/api/series${MS.qs({ topic, path: path === '' ? '.' : path, from_ms: b.from_ms, to_ms: b.to_ms ?? Date.now(), max_points: maxPoints })}`);
       if (topic !== S.selected || S.tab !== 'chart' || $('chart-path').value !== path) return;
       const data = MS.toColumns(res.points);
-      if (!data[0].length) { chartEmpty('bi-graph-down', 'No stored values for this path in the range.', 'Try a wider range.'); return; }
+      if (!data[0].length) { chartEmpty('graph-down', 'No stored values for this path in the range.', 'Try a wider range.'); return; }
       $('chart-empty').hidden = true;
       S.chart?.destroy();
       const pane = $('tab-chart');
@@ -714,7 +714,7 @@
       S.chart.path = path;
       S.chart.live = b.live;
     } catch (e) {
-      chartEmpty('bi-exclamation-triangle', `Could not load the series: ${e.message}`);
+      chartEmpty('exclamation-triangle', `Could not load the series: ${e.message}`);
     }
   }
 
@@ -795,7 +795,7 @@
     const btn = $('pub-submit');
     btn.dataset.variant = 'primary';
     delete btn.dataset.tone;
-    btn.innerHTML = '<i class="t-icon bi bi-send" aria-hidden="true"></i>Publish';
+    btn.innerHTML = MS.icon('send') + 'Publish';
     $('pub-confirm-text').hidden = true;
   }
 
@@ -837,7 +837,7 @@
       const btn = $('pub-submit');
       btn.dataset.variant = 'solid';
       btn.dataset.tone = 'warning';
-      btn.innerHTML = '<i class="t-icon bi bi-exclamation-triangle" aria-hidden="true"></i>Confirm publish';
+      btn.innerHTML = MS.icon('exclamation-triangle') + 'Confirm publish';
       const t = $('pub-confirm-text');
       t.textContent = `Send ${MS.fmtBytes(new TextEncoder().encode(payload).length)} to ${topic} (QoS ${qos}${retain ? ', retained' : ''})?`;
       t.hidden = false;
@@ -879,7 +879,7 @@
       const res = await MS.getJSON(`/api/search${MS.qs({ q, topic: scoped ? S.selected : null, from_ms: b.from_ms, to_ms: b.to_ms })}`);
       const list = res.results || [];
       summary.textContent = `${MS.fmtNum(list.length)} result${list.length === 1 ? '' : 's'} for “${q}”${scoped ? ` in ${S.selected}` : ''} · ${$('range').selectedOptions[0].textContent.toLowerCase()}`;
-      if (!list.length) { results.innerHTML = MS.empty('bi-search', 'Nothing matched.', 'Search covers stored payloads only; try a wider time range.', false); return; }
+      if (!list.length) { results.innerHTML = MS.empty('search', 'Nothing matched.', 'Search covers stored payloads only; try a wider time range.', false); return; }
       results.innerHTML = list.map((r, i) => `<button type="button" class="search-result" data-i="${i}">`
         + `<div class="search-result-head"><span class="search-result-topic">${esc(r.topic)}</span>`
         + `<span class="tl-size">${MS.fmtBytes(r.size)}</span>`
@@ -892,7 +892,7 @@
       }));
     } catch (e) {
       summary.textContent = '';
-      results.innerHTML = MS.empty('bi-exclamation-triangle', `Search failed: ${e.message}`, null, false);
+      results.innerHTML = MS.empty('exclamation-triangle', `Search failed: ${e.message}`, null, false);
     }
   }
 
@@ -914,7 +914,7 @@
     const btn = $('pause-btn');
     btn.setAttribute('aria-pressed', S.paused);
     if (S.paused) btn.dataset.tone = 'warning'; else delete btn.dataset.tone;
-    btn.innerHTML = S.paused ? '<i class="t-icon bi bi-play-fill" aria-hidden="true"></i><span>Resume</span>' : '<i class="t-icon bi bi-pause-fill" aria-hidden="true"></i><span>Pause</span>';
+    btn.innerHTML = S.paused ? MS.icon('play-fill') + '<span>Resume</span>' : MS.icon('pause-fill') + '<span>Pause</span>';
     btn.title = S.paused ? 'Resume live updates' : 'Pause live updates';
     if (!S.paused && S.missed) loadHistory({ keepSelection: true });
     S.missed = 0;
@@ -957,7 +957,7 @@
       const res = await MS.getJSON('/api/topics');
       loadTopicList(res.topics);
     } catch (e) {
-      $('tree').innerHTML = MS.empty('bi-exclamation-triangle', `Could not load topics: ${e.message}`);
+      $('tree').innerHTML = MS.empty('exclamation-triangle', `Could not load topics: ${e.message}`);
       $('topic-count').textContent = 'Topics unavailable';
       return false;
     }

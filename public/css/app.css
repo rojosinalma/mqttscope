@@ -6,12 +6,8 @@
 
 :root { --mono: var(--t-font-mono); }
 
-/* ─── Small vocabulary gaps (one line each, no new t-* names) ──── */
-.t-nowrap { white-space: nowrap; }
-.card-header-end { margin-left: auto; display: inline-flex; align-items: center; gap: var(--t-space-2); }
-.card-header-tools .t-select { width: auto; }
+/* ─── Small vocabulary gaps ──────────────────────────────── */
 .section-title-sub { font-weight: 400; text-transform: lowercase; }
-@media (max-width: 991.98px) { .t-shell[data-sidebar="none"] { grid-template-rows: auto 1fr var(--t-footer-h); } }
 
 /* ─── Scrollbars ─────────────────────────────────────────── */
 .pane-body, .search-results, .rules-editor, .t-table-wrap {
@@ -30,11 +26,9 @@
   border: var(--t-border-w) solid var(--t-border);
   white-space: nowrap; margin-right: var(--t-space-3);
 }
-.app-navbar .t-navbar-end .t-select { width: auto; }
 @media (max-width: 767.98px) {
   .nav-label { display: none; }
   #conn-label { display: none; }
-  .app-navbar .t-navbar-end .t-select { display: none; }
 }
 
 /* ─── Disconnected banner ────────────────────────────────── */
@@ -45,8 +39,7 @@
 
 /* ─── Shared bits ────────────────────────────────────────── */
 .notice { max-width: 520px; margin: 3rem auto 0; }
-.range-select { width: auto; min-width: 9.5rem; }
-.qos-select { width: auto; }
+.range-select { min-width: 9.5rem; }
 textarea.auto-rows { resize: vertical; field-sizing: content; min-height: 6rem; max-height: 40vh; }
 .kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.35rem 1rem; margin: 0; font-size: var(--t-text-sm); }
 .kv dt { color: var(--t-info); font-weight: 400; font-size: 0.8rem; white-space: nowrap; }
@@ -71,7 +64,6 @@ textarea.auto-rows { resize: vertical; field-sizing: content; min-height: 6rem; 
 .search-form .t-input-group { flex: 1 1 auto; }
 .search-form .t-check { margin: 0; }
 .toolbar-controls { margin-left: auto; }
-.toolbar-controls .t-select, .toolbar-controls .t-input { width: auto; }
 .custom-range { display: flex; align-items: center; gap: 0.4rem; }
 #pause-btn[aria-pressed="true"] { color: var(--t-warning); border-color: var(--t-warning); background: color-mix(in srgb, var(--t-warning) var(--t-tint-weak), transparent); }
 
@@ -143,7 +135,7 @@ textarea.auto-rows { resize: vertical; field-sizing: content; min-height: 6rem; 
 }
 .tree-row.selected .tree-name { color: var(--t-accent); }
 .tree-toggle {
-  flex: none; width: 1rem; text-align: center;
+  flex: none; width: 1rem;
   color: var(--t-muted); font-size: 0.7rem;
   transition: transform 0.12s;
 }
@@ -231,7 +223,7 @@ textarea.auto-rows { resize: vertical; field-sizing: content; min-height: 6rem; 
 .diff-line.plus  { color: var(--t-success); }
 
 .chart-controls { display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.6rem; }
-.chart-controls .t-select { flex: 1 1 auto; width: auto; }
+.chart-controls .t-select { flex: 1 1 auto; }
 .chart-box { width: 100%; min-height: 0; }
 .chart-box .u-legend { color: var(--t-text); font-size: 0.72rem; }
 .chart-box .u-legend th { font-weight: 500; }
@@ -239,7 +231,6 @@ textarea.auto-rows { resize: vertical; field-sizing: content; min-height: 6rem; 
 
 /* ─── Publish / search dialogs ───────────────────────────── */
 .pub-confirm-text { margin-right: auto; }
-.search-dialog { width: min(1140px, calc(100vw - 2rem)); }
 .search-dialog-body { padding: 0; }
 .search-summary { padding: 0.6rem 1rem; font-size: 0.8rem; color: var(--t-muted); border-bottom: var(--t-border-w) solid var(--t-border); }
 .search-summary:empty { display: none; }
@@ -277,8 +268,8 @@ textarea.auto-rows { resize: vertical; field-sizing: content; min-height: 6rem; 
 .fields-grid div { display: flex; gap: 0.75rem; justify-content: space-between; border-bottom: 1px dashed var(--t-border); padding: 0.15rem 0; min-width: 0; }
 .fields-grid .f-key { color: var(--t-info); font-family: var(--mono); white-space: nowrap; }
 .fields-grid .f-val { color: var(--t-text); font-family: var(--mono); text-align: right; overflow-wrap: anywhere; min-width: 0; }
-.expand-btn .bi { transition: transform 0.15s; display: inline-block; }
-.expand-btn[aria-expanded="true"] .bi { transform: rotate(90deg); }
+.expand-btn .t-icon { transition: transform 0.15s; }
+.expand-btn[aria-expanded="true"] .t-icon { transform: rotate(90deg); }
 .device-filter { width: 240px; }
 
 /* ─── Presence timeline bar ──────────────────────────────── */

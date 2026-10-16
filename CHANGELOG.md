@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Icons come from tailor's Iconify sprite (`public/tailor/icons.svg`, 50 Bootstrap Icons subsetted by
+  `tailor apply --icons`) as inline `<svg class="t-icon">` references; I removed the Bootstrap Icons font
+  and its stylesheet from `public/vendor/`. A small `MS.icon(name)` helper builds them in the page scripts.
+- `app.css` lost the stopgaps that tailor core 0.5.1 now covers: `t-nowrap`, the card header tools slot
+  (`t-card-tools`), the narrow-viewport shell grid fix, the 1140px search dialog (`data-size="xl"`) and the
+  `width: auto` toolbar selects/inputs (`data-width="auto"`).
+
 ## [0.3.0] - 2026-10-16
 
 ### Changed

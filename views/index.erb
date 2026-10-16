@@ -1,14 +1,14 @@
 <div class="explorer-toolbar">
   <form id="search-form" class="search-form" autocomplete="off">
     <div class="t-input-group" data-size="sm">
-      <span class="t-input-addon"><i class="bi bi-search" aria-hidden="true"></i></span>
+      <span class="t-input-addon"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-search"/></svg></span>
       <input id="search-q" class="t-input" type="search" placeholder="Search payloads…" aria-label="Search payloads">
       <button class="t-btn" type="submit">Search</button>
     </div>
     <label class="t-check t-small t-nowrap"><input class="t-check-input" type="checkbox" id="search-scope"><span class="t-check-label">this topic only</span></label>
   </form>
   <div class="t-toolbar toolbar-controls">
-    <select id="range" class="t-select range-select" data-size="sm" aria-label="Time range">
+    <select id="range" class="t-select range-select" data-size="sm" data-width="auto" aria-label="Time range">
       <option value="15m">Last 15 min</option>
       <option value="1h">Last hour</option>
       <option value="6h">Last 6 hours</option>
@@ -17,16 +17,16 @@
       <option value="custom">Custom…</option>
     </select>
     <div id="custom-range" class="custom-range" hidden>
-      <input id="range-from" type="datetime-local" class="t-input" data-size="sm" aria-label="From">
+      <input id="range-from" type="datetime-local" class="t-input" data-size="sm" data-width="auto" aria-label="From">
       <span class="t-muted">→</span>
-      <input id="range-to" type="datetime-local" class="t-input" data-size="sm" aria-label="To">
+      <input id="range-to" type="datetime-local" class="t-input" data-size="sm" data-width="auto" aria-label="To">
       <button id="range-apply" class="t-btn" data-size="sm" type="button">Apply</button>
     </div>
     <button id="pause-btn" class="t-btn" data-size="sm" type="button" aria-pressed="false" title="Pause live updates">
-      <i class="t-icon bi bi-pause-fill" aria-hidden="true"></i><span>Pause</span>
+      <svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-pause-fill"/></svg><span>Pause</span>
     </button>
     <button id="publish-btn" class="t-btn" data-variant="primary" data-size="sm" type="button" title="Publish a message" hidden>
-      <i class="t-icon bi bi-send" aria-hidden="true"></i>Publish
+      <svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-send"/></svg>Publish
     </button>
   </div>
 </div>
@@ -35,10 +35,10 @@
   <section class="pane pane-tree" aria-label="Topics">
     <div class="pane-head">
       <div class="t-input-group" data-size="sm">
-        <span class="t-input-addon"><i class="bi bi-funnel" aria-hidden="true"></i></span>
+        <span class="t-input-addon"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-funnel"/></svg></span>
         <input id="topic-filter" data-hotkey="/" class="t-input" type="search" placeholder="Filter topics: text or glob (+ # *)" aria-label="Filter topics">
       </div>
-      <button id="tree-collapse" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Collapse all" aria-label="Collapse all"><i class="bi bi-arrows-collapse"></i></button>
+      <button id="tree-collapse" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Collapse all" aria-label="Collapse all"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-arrows-collapse"/></svg></button>
     </div>
     <div class="pane-sub"><span id="topic-count">Loading topics…</span></div>
     <div id="tree" class="pane-body tree-body"></div>
@@ -52,7 +52,7 @@
     <div id="timeline" class="pane-body timeline-body"></div>
     <div class="pane-foot">
       <span id="tl-status" class="t-small t-muted"></span>
-      <button id="load-more" class="t-btn" data-size="sm" type="button" hidden><i class="t-icon bi bi-chevron-double-down" aria-hidden="true"></i>Load more</button>
+      <button id="load-more" class="t-btn" data-size="sm" type="button" hidden><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-chevron-double-down"/></svg>Load more</button>
     </div>
   </section>
 
@@ -60,20 +60,20 @@
     <div class="pane-head">
       <div class="t-tabs pane-tabs" data-variant="underline">
         <div class="t-tabs-list" role="tablist">
-          <button class="t-tab" role="tab" type="button" data-tab="payload" id="tab-btn-payload" aria-controls="tab-payload" aria-selected="true"><i class="t-icon bi bi-braces" aria-hidden="true"></i>Payload</button>
-          <button class="t-tab" role="tab" type="button" data-tab="diff" id="tab-btn-diff" aria-controls="tab-diff" aria-selected="false" tabindex="-1"><i class="t-icon bi bi-file-diff" aria-hidden="true"></i>Diff</button>
-          <button class="t-tab" role="tab" type="button" data-tab="chart" id="tab-btn-chart" aria-controls="tab-chart" aria-selected="false" tabindex="-1"><i class="t-icon bi bi-graph-up" aria-hidden="true"></i>Chart</button>
+          <button class="t-tab" role="tab" type="button" data-tab="payload" id="tab-btn-payload" aria-controls="tab-payload" aria-selected="true"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-braces"/></svg>Payload</button>
+          <button class="t-tab" role="tab" type="button" data-tab="diff" id="tab-btn-diff" aria-controls="tab-diff" aria-selected="false" tabindex="-1"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-file-diff"/></svg>Diff</button>
+          <button class="t-tab" role="tab" type="button" data-tab="chart" id="tab-btn-chart" aria-controls="tab-chart" aria-selected="false" tabindex="-1"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-graph-up"/></svg>Chart</button>
         </div>
       </div>
-      <button id="copy-btn" class="t-btn pane-head-end" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Copy payload" aria-label="Copy payload" hidden><i class="bi bi-clipboard"></i></button>
+      <button id="copy-btn" class="t-btn pane-head-end" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Copy payload" aria-label="Copy payload" hidden><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-clipboard"/></svg></button>
     </div>
     <div id="detail-meta" class="detail-meta" hidden></div>
     <div id="tab-payload" class="pane-body detail-body" role="tabpanel" aria-labelledby="tab-btn-payload"></div>
     <div id="tab-diff" class="pane-body detail-body" role="tabpanel" aria-labelledby="tab-btn-diff" hidden></div>
     <div id="tab-chart" class="pane-body detail-body" role="tabpanel" aria-labelledby="tab-btn-chart" hidden>
       <div class="chart-controls">
-        <select id="chart-path" class="t-select" data-size="sm" aria-label="Numeric path"></select>
-        <button id="chart-reload" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Reload series" aria-label="Reload series"><i class="bi bi-arrow-clockwise"></i></button>
+        <select id="chart-path" class="t-select" data-size="sm" data-width="auto" aria-label="Numeric path"></select>
+        <button id="chart-reload" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Reload series" aria-label="Reload series"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-arrow-clockwise"/></svg></button>
       </div>
       <div id="chart-empty" hidden></div>
       <div id="chart-box" class="chart-box"></div>
@@ -84,7 +84,7 @@
 <dialog class="t-dialog" id="publish-modal" data-size="lg" aria-labelledby="publish-title">
   <form id="publish-form" autocomplete="off">
     <div class="t-dialog-header">
-      <h2 class="t-dialog-title" id="publish-title"><i class="t-icon bi bi-send" aria-hidden="true"></i>Publish a message</h2>
+      <h2 class="t-dialog-title" id="publish-title"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-send"/></svg>Publish a message</h2>
       <button type="button" class="t-dialog-close" data-dialog-close aria-label="Close">×</button>
     </div>
     <div class="t-dialog-body t-stack">
@@ -102,7 +102,7 @@
         <label class="t-check" data-variant="switch"><input class="t-check-input" type="checkbox" role="switch" id="pub-retain"><span class="t-check-label">Retain</span></label>
         <div class="t-cluster" data-gap="2">
           <label class="t-label" for="pub-qos">QoS</label>
-          <select id="pub-qos" class="t-select qos-select" data-size="sm">
+          <select id="pub-qos" class="t-select" data-size="sm" data-width="auto">
             <option value="0">0 · at most once</option>
             <option value="1">1 · at least once</option>
             <option value="2">2 · exactly once</option>
@@ -113,14 +113,14 @@
     <div class="t-dialog-footer">
       <span id="pub-confirm-text" class="t-small t-tone-text pub-confirm-text" data-tone="warning" hidden></span>
       <button type="button" class="t-btn" data-dialog-close>Cancel</button>
-      <button type="submit" id="pub-submit" class="t-btn" data-variant="primary"><i class="t-icon bi bi-send" aria-hidden="true"></i>Publish</button>
+      <button type="submit" id="pub-submit" class="t-btn" data-variant="primary"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-send"/></svg>Publish</button>
     </div>
   </form>
 </dialog>
 
-<dialog class="t-dialog search-dialog" id="search-modal" data-size="lg" aria-labelledby="search-title">
+<dialog class="t-dialog" id="search-modal" data-size="xl" aria-labelledby="search-title">
   <div class="t-dialog-header">
-    <h2 class="t-dialog-title" id="search-title"><i class="t-icon bi bi-search" aria-hidden="true"></i>Search results</h2>
+    <h2 class="t-dialog-title" id="search-title"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-search"/></svg>Search results</h2>
     <button type="button" class="t-dialog-close" data-dialog-close aria-label="Close">×</button>
   </div>
   <div class="t-dialog-body search-dialog-body">
