@@ -11,7 +11,6 @@
 .card-header-end { margin-left: auto; display: inline-flex; align-items: center; gap: var(--t-space-2); }
 .card-header-tools .t-select { width: auto; }
 .section-title-sub { font-weight: 400; text-transform: lowercase; }
-[data-mode="dark"] .theme-icon-light { display: none; } [data-mode="light"] .theme-icon-dark { display: none; }
 @media (max-width: 991.98px) { .t-shell[data-sidebar="none"] { grid-template-rows: auto 1fr var(--t-footer-h); } }
 
 /* ─── Scrollbars ─────────────────────────────────────────── */

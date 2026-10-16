@@ -8,8 +8,6 @@
    ] -%>
 <% page_script = tabs.map(&:first).include?(current) ? current : nil -%>
 <% charts = %w[explorer stats].include?(current) -%>
-<% skins = %w[bootstrap webtui daisyui govuk luz pico simple tufte] -%>
-<% palettes = %w[dracula ayu catppuccin everforest flexoki gruvbox kanagawa modusvivendi nightfox nightowl nord onedark oxocarbon poimandres rosepine selenized solarized synthwave84 tokyonight vitesse zenburn] -%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,19 +35,6 @@
       <li><a class="t-navbar-link"<%= ' aria-current="page"' if current == key %> href="<%= href %>"><i class="t-icon bi <%= icon %>" aria-hidden="true"></i><span class="nav-label"><%= label %></span></a></li>
 <% end -%>
     </ul>
-    <div class="t-navbar-end">
-      <select class="t-select" data-size="sm" data-tailor-picker="skin" aria-label="Skin" title="Skin">
-<% skins.each do |s| -%>
-        <option value="<%= s %>"><%= s %></option>
-<% end -%>
-      </select>
-      <select class="t-select" data-size="sm" data-tailor-picker="palette" aria-label="Palette" title="Palette">
-<% palettes.each do |p| -%>
-        <option value="<%= p %>"><%= p %></option>
-<% end -%>
-      </select>
-      <button class="t-btn" data-variant="ghost" data-size="sm" data-tailor-mode-toggle type="button" aria-label="Toggle light/dark" title="Toggle light/dark mode"><i class="bi bi-sun-fill theme-icon-light"></i><i class="bi bi-moon-fill theme-icon-dark"></i></button>
-    </div>
   </header>
 
   <main class="t-shell-main t-page main-content<%= " main-fill" if current == "explorer" %>">
@@ -64,6 +49,7 @@
   <footer class="t-footer t-shell-foot">
     <div class="t-footer-end">
       <span class="t-footer-version">mqttscope <%= APP_VERSION %></span>
+      <div data-tailor-pickers></div>
     </div>
   </footer>
 </div>
