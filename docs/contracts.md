@@ -1,51 +1,9 @@
-# mqttscope — module and API contracts
+# Module contracts
 
-Every module below is owned by one file. Callers rely on these signatures; change them here first.
+Each module below lives in one file. Callers rely on these signatures; when changing one, update it here first. Settings keys are listed in [`configuration.md`](configuration.md) and the HTTP API in [`api.md`](api.md).
 Timestamps are Integer **milliseconds since epoch** (`ts_ms`). Payloads are `String` (binary-safe).
 
-## Settings (`models/setting.rb`, `Setting.fetch(key, default)`)
-
-| key | default | meaning |
-|---|---|---|
-| `mqtt_host` | `ENV["MQTT_HOST"]` at first boot, else `mosquitto` | broker host |
-| `mqtt_port` | `ENV["MQTT_PORT"]` at first boot, else `1883` | |
-| `mqtt_user` | `ENV["MQTT_USER"]` at first boot, else empty (anonymous) | |
-| `mqtt_pass` | `ENV["MQTT_PASS"]` at first boot | |
-| `mqtt_client_id` | `ENV["MQTT_CLIENT_ID"]` at first boot, else `mqttscope` | |
-| `mqtt_subscriptions` | `#,$SYS/#` | comma list of filters the ingest subscribes to |
-| `mqtt_keepalive_s` | `30` | |
-| `reconnect_backoff_s` | `2,5,10,30,60` | comma list |
-| `publish_enabled` | `true` | UI publish allowed |
-| `max_payload_bytes` | `262144` | larger payloads are stored truncated, flagged `truncated: true` |
-| `dedup_enabled` | `true` | drop consecutive identical payloads per topic (bump `dup_count`) |
-| `default_min_interval_ms` | `1000` | store at most one message per topic per interval |
-| `sample_rules` | JSON `[{"pattern":"$SYS/#","min_interval_ms":60000}]` | first matching rule wins; e.g. add `{"pattern":"esp32/+/data","min_interval_ms":10000}` to throttle a chatty device family |
-| `retention_days` | `7` | |
-| `max_db_bytes` | `10737418240` | 10 GB, always enforced |
-| `prune_interval_s` | `3600` | |
-| `prune_batch` | `5000` | rows per delete batch |
-| `max_topics` | `20000` | in-memory registry cap (LRU evict) |
-| `rate_window_s` | `60` | window for msgs/s |
-| `sse_max_clients` | `12` | must stay below Puma max threads (16) — each stream holds one |
-| `sse_idle_timeout_s` | `300` | close a stream idle this long (no events, heartbeats don't count) |
-| `sse_heartbeat_s` | `15` | `: ping` comment interval |
-| `sse_queue_size` | `500` | per-client queue; overflow drops oldest and emits `{type:"dropped",n}` |
-| `presence_rules` | JSON `[]` | no devices tracked until a rule is added, e.g. `{"name":"esp32","pattern":"esp32/+/status","id_segment":1,"online_path":"online","label_path":"hostname","stale_s":90}` |
-| `history_default_limit` | `200` | |
-| `search_default_limit` | `100` | |
-| `series_max_rows` | `50000` | rows scanned per `Store.series` call |
-| `search_max_rows` | `20000` | rows scanned when a wildcard topic filter is applied in Ruby |
-| `api_max_limit` | `5000` | cap on `limit` / `max_points` query params |
-| `series_default_points` | `500` | default `max_points` |
-| `timeline_max_rows` | `5000` | history rows read per device timeline |
-| `diff_max_lines` | `2000` | longest text section line-diffed; larger → summary only |
-| `ingest_max_backlog` | `10000` | if the MQTT client's read queue exceeds this, queued messages are acked and dropped (warned) |
-| `publish_echo_ttl_s` | `10` | how long a UI publish is remembered to tag its echo `origin: ui` |
-
-Settings are read at use time (no caching beyond a request), so edits apply immediately except
-connection params (`Ingest.reconnect!` after saving those).
-
-## Shared (written in the skeleton, do not replace)
+## Shared helpers (`lib/topic_match.rb`, `lib/worker_pool.rb`, `lib/bus.rb`)
 
 ```ruby
 TopicMatch.match?(filter, topic)        # MQTT wildcards (+, #), "$SYS" topics only match filters starting with "$SYS"
@@ -75,7 +33,7 @@ Bus events (Hashes, symbol keys, JSON-encoded as-is by the SSE route):
 `payload` in `message` events is the UTF-8 string if valid, else `nil` with `binary: true` and
 `payload_b64:`.
 
-## Ingest (`lib/ingest.rb`, owner A) — loaded once
+## Ingest (`lib/ingest.rb`) — loaded once
 
 ```ruby
 Ingest.start                       # idempotent; supervised thread, backoff reconnect, resubscribes
@@ -91,7 +49,7 @@ first-seen topics and `connection` events on state change. Subscriptions are QoS
 refused (ruby-mqtt has no QoS 2 handshake). UI-origin messages are always stored. On a dedup hit
 (`Sampling.last_reason(topic) == :dup`) `Store.bump_dup` is called instead of `record`.
 
-## TopicRegistry (`lib/topic_registry.rb`, owner A) — reloadable
+## TopicRegistry (`lib/topic_registry.rb`) — reloadable
 
 ```ruby
 TopicRegistry.touch(topic:, ts_ms:, size:, retained:, payload:)   # counts, rate ring, last payload (capped to max_payload_bytes), LRU
@@ -104,7 +62,7 @@ TopicRegistry.warm(rows) # seed from Store.topics at boot
 `retained:` is "the last message seen on this topic carried the retain flag" — on (re)connect the
 broker replays retained messages with the flag set, so this is accurate right after subscribe.
 
-## Sampling (`lib/sampling.rb`, owner B) — reloadable
+## Sampling (`lib/sampling.rb`) — reloadable
 
 ```ruby
 Sampling.store?(topic:, payload:, ts_ms:)   # applies dedup then min-interval; keeps per-topic last-stored state (bounded by max_topics)
@@ -112,7 +70,7 @@ Sampling.rule_for(topic)                    # {pattern:, min_interval_ms:} or de
 Sampling.rules                              # parsed sample_rules, validated; bad JSON → [] with a warning
 ```
 
-## Store (`lib/store.rb`, owner B) — reloadable
+## Store (`lib/store.rb`) — reloadable
 
 ```ruby
 Store.record(topic:, payload:, ts_ms:, retained:, qos:, origin:)  # -> {id:, truncated:} ; upserts topics row
@@ -130,7 +88,7 @@ Store.stats                                                       # {messages:, 
 
 Message hash: `{id:, topic:, ts_ms:, payload:, size:, retained:, qos:, origin:, dup_count:, truncated:}`.
 
-## Pruner (`lib/pruner.rb`, owner B) — loaded once
+## Pruner (`lib/pruner.rb`) — loaded once
 
 ```ruby
 Pruner.start          # idempotent; sleeps prune_interval_s between runs
@@ -142,7 +100,7 @@ Age rule first, then while `db_size_bytes > max_db_bytes` delete the oldest `pru
 `PRAGMA incremental_vacuum` after each batch. Also drops `topics` rows with no messages and not
 seen for `retention_days`.
 
-## Differ (`lib/differ.rb`, owner C) — reloadable, pure
+## Differ (`lib/differ.rb`) — reloadable, pure
 
 ```ruby
 Differ.classify(payload)     # :json | :text | :binary | :empty
@@ -154,7 +112,7 @@ Differ.flatten(json)         # {"a.b" => 1, "arr[0]" => "x"} dotted/indexed path
 Differ.numeric_paths(payload) # paths whose value is numeric, for the chart dropdown
 ```
 
-## Presence (`lib/presence.rb`, owner C) — reloadable
+## Presence (`lib/presence.rb`) — reloadable
 
 ```ruby
 Presence.rules                       # parsed presence_rules
@@ -168,28 +126,6 @@ use the whole payload as the flag (`true 1 online on yes up connected` → onlin
 online but silent longer than `stale_s`. Timelines treat silence longer than `stale_s` as offline.
 A bare JSON scalar flattens to path `""` (root) — `Store.series` must accept `path: ""`.
 
-## HTTP API (`routes/api.rb`, owner D). All responses `{ok:, message:, ...}`; errors `json_err` with 4xx/5xx.
-
-```
-GET  /api/topics                                  -> {topics: [registry entries merged with Store.topics stored counts]}
-GET  /api/messages?topic=&from_ms=&to_ms=&limit=&before_id=   -> {messages: [...]}   (topic required, exact)
-GET  /api/messages/:id                            -> {message:}
-GET  /api/diff?id=                                -> {diff:, from: message|nil, to: message}   (vs Store.previous)
-GET  /api/series?topic=&path=&from_ms=&to_ms=&max_points=    -> {points: [[ts_ms, v], ...]}   (path optional; "" or "." = the payload itself)
-GET  /api/paths?topic=                            -> {paths: Differ.numeric_paths(last payload)}
-GET  /api/search?q=&topic=&from_ms=&to_ms=&limit= -> {results: [...]}
-GET  /api/stats                                   -> {ingest:, db:, sys: Store.sys_latest, sse_clients:, prune: Pruner.last_run}
-GET  /api/stats/series?topic=$SYS/...&from_ms=&to_ms=&max_points=   -> {points:}  (alias of /api/series)
-GET  /api/devices                                 -> {devices:}
-GET  /api/devices/:id/timeline?from_ms=&to_ms=    -> {timeline:}
-POST /api/publish {topic, payload, retain?, qos?} -> json_ok("Published")  | 403 when publish_enabled=false | 503 when not connected
-GET  /api/settings                                -> {settings: {key => value}}  (mqtt_pass masked as "••••" unless empty)
-POST /api/settings {key: value, ...}              -> json_ok; validates JSON rule keys, ints, filters; unchanged "••••" leaves mqtt_pass alone; triggers Ingest.reconnect! if connection keys changed
-POST /api/prune                                   -> json_ok with Pruner.run_now result
-POST /api/reconnect                               -> json_ok
-GET  /api/stream?topics=<comma filters, default "#">   SSE; event: <type>, data: <json>. Heartbeat comments, idle timeout, bounded by Bus.
-```
-
-## Pages (`routes/pages.rb` + `views/`, owner E)
+## Pages (`routes/pages.rb` + `views/`)
 
 `/` explorer · `/stats` · `/devices` · `/settings`. Layout: `views/layout.erb` (navbar, footer with VERSION, toast container, theme toggle). JS in `public/js/`, CSS in `public/css/app.css`.
