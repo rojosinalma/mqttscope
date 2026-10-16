@@ -20,14 +20,14 @@
   const keyOf = (d) => `${d.name}:${d.id}`;
 
   function statusOf(d) {
-    if (d.online) return { cls: 'status-dot--ok', text: 'online' };
-    if (d.stale) return { cls: 'status-dot--warn', text: 'stale' };
-    return { cls: 'status-dot--down', text: 'offline' };
+    if (d.online) return { status: 'running', text: 'online' };
+    if (d.stale) return { status: 'degraded', text: 'stale' };
+    return { status: 'stopped', text: 'offline' };
   }
 
   function fieldsHTML(fields) {
     const entries = Object.entries(fields || {});
-    if (!entries.length) return '<div class="small text-muted">No fields in the last payload.</div>';
+    if (!entries.length) return '<div class="t-small t-muted">No fields in the last payload.</div>';
     return `<div class="fields-grid">${entries.map(([k, v]) => {
       let s = typeof v === 'string' ? v : JSON.stringify(v);
       if (s && s.length > FIELD_VALUE_MAX) s = `${s.slice(0, FIELD_VALUE_MAX)}…`;
@@ -49,30 +49,30 @@
     const empty = $('devices-empty');
     const wrap = $('devices-wrap');
     if (!state.devices.length || !list.length) {
-      wrap.classList.add('d-none');
-      empty.classList.remove('d-none');
+      wrap.hidden = true;
+      empty.hidden = false;
       empty.innerHTML = state.devices.length
         ? MS.empty('bi-funnel', 'No devices match the filter.', null, false)
         : MS.empty('bi-cpu', 'No devices detected yet.', 'Devices come from the presence rules in Settings → Presence, matched against live topics.', false);
       return;
     }
-    empty.classList.add('d-none');
-    wrap.classList.remove('d-none');
+    empty.hidden = true;
+    wrap.hidden = false;
 
     $('devices-body').innerHTML = list.map((d) => {
       const k = keyOf(d);
       const st = statusOf(d);
       const open = state.expanded.has(k);
-      const sel = state.selected && state.selected.key === k ? ' selected' : '';
-      const row = `<tr class="device-row${sel}" data-key="${esc(k)}">`
-        + `<td class="col-icon"><i class="bi bi-circle-fill status-dot ${st.cls}" title="${st.text}"></i></td>`
+      const sel = state.selected && state.selected.key === k;
+      const row = `<tr class="device-row" data-key="${esc(k)}" aria-selected="${sel}">`
+        + `<td class="t-col-icon"><span class="t-dot" data-status="${st.status}" title="${st.text}"></span></td>`
         + `<td><div class="device-label">${esc(d.label || d.id)}</div><div class="device-topic">${esc(d.topic)}</div></td>`
-        + `<td class="mono">${esc(d.id)}</td>`
-        + `<td><span class="badge badge-tint tint-purple">${esc(d.name)}</span></td>`
+        + `<td class="t-mono">${esc(d.id)}</td>`
+        + `<td><span class="t-badge" data-tone="purple">${esc(d.name)}</span></td>`
         + `<td title="${esc(MS.fmtISO(d.last_seen_ms))}">${esc(MS.fmtRel(d.last_seen_ms))}</td>`
         + `<td title="${esc(MS.fmtISO(d.since_ms))}">${esc(d.since_ms ? MS.fmtRel(d.since_ms) : '—')}</td>`
-        + `<td class="col-icon">${d.stale ? '<span class="badge badge-tint tint-orange" title="Not seen within the rule\'s stale_s">stale</span>' : `<span class="badge badge-tint ${d.online ? 'tint-green' : 'tint-red'}">${st.text}</span>`}</td>`
-        + `<td class="col-icon"><button class="btn btn-sm btn-icon expand-btn" type="button" data-expand="${esc(k)}" aria-expanded="${open}" title="Show fields"><i class="bi bi-chevron-right"></i></button></td>`
+        + `<td class="t-col-icon">${d.stale ? '<span class="t-badge" data-tone="orange" title="Not seen within the rule\'s stale_s">stale</span>' : `<span class="t-badge" data-tone="${d.online ? 'success' : 'danger'}">${st.text}</span>`}</td>`
+        + `<td class="t-col-icon"><button class="t-btn expand-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-expand="${esc(k)}" aria-expanded="${open}" title="Show fields" aria-label="Show fields"><i class="bi bi-chevron-right"></i></button></td>`
         + '</tr>';
       const fields = open ? `<tr class="fields-row"><td colspan="8">${fieldsHTML(d.fields)}</td></tr>` : '';
       return row + fields;
@@ -89,8 +89,8 @@
       if (state.selected && !state.devices.some((d) => keyOf(d) === state.selected.key)) closeTimeline();
     } catch (e) {
       if (!state.loadedOnce) {
-        $('devices-wrap').classList.add('d-none');
-        $('devices-empty').classList.remove('d-none');
+        $('devices-wrap').hidden = true;
+        $('devices-empty').hidden = false;
         $('devices-empty').innerHTML = MS.empty('bi-exclamation-triangle', `Could not load devices: ${e.message}`, null, false);
       } else {
         MS.toast('error', `Could not refresh devices: ${e.message}`);
@@ -102,7 +102,7 @@
   function closeTimeline() {
     state.selected = null;
     MS.save('ms.devices.selected', null);
-    $('timeline-card').classList.add('d-none');
+    $('timeline-card').hidden = true;
     render();
   }
 
@@ -124,7 +124,7 @@
   async function loadTimeline() {
     const sel = state.selected;
     if (!sel) return;
-    $('timeline-card').classList.remove('d-none');
+    $('timeline-card').hidden = false;
     $('timeline-title').textContent = `${sel.label} · timeline`;
     $('timeline-range').value = state.range;
     const to = Date.now();
@@ -135,14 +135,14 @@
       const segs = segmentsFor(res.timeline, from, to);
       const known = segs.filter((s) => s.kind !== 'none');
       if (!known.length) {
-        $('timeline-wrap').classList.add('d-none');
-        $('timeline-empty').classList.remove('d-none');
+        $('timeline-wrap').hidden = true;
+        $('timeline-empty').hidden = false;
         $('timeline-empty').innerHTML = MS.empty('bi-bar-chart-steps', 'No presence history in this range.', 'History builds from stored status messages.');
         $('timeline-uptime').textContent = '';
         return;
       }
-      $('timeline-empty').classList.add('d-none');
-      $('timeline-wrap').classList.remove('d-none');
+      $('timeline-empty').hidden = true;
+      $('timeline-wrap').hidden = false;
       const bar = $('timeline-bar');
       bar.innerHTML = '';
       segs.forEach((s) => {
@@ -160,8 +160,8 @@
       const flips = known.filter((s) => s.kind === 'off').length;
       $('timeline-uptime').textContent = `${((onMs / knownMs) * 100).toFixed(1)} % online · ${flips} offline period${flips === 1 ? '' : 's'}`;
     } catch (e) {
-      $('timeline-wrap').classList.add('d-none');
-      $('timeline-empty').classList.remove('d-none');
+      $('timeline-wrap').hidden = true;
+      $('timeline-empty').hidden = false;
       $('timeline-empty').innerHTML = MS.empty('bi-exclamation-triangle', `Could not load the timeline: ${e.message}`);
     }
   }

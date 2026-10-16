@@ -1,58 +1,60 @@
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
-  <h4 class="page-title mb-0"><i class="bi bi-speedometer2 me-2"></i>Stats</h4>
-  <span id="stats-updated" class="small text-muted"></span>
-</div>
+<header class="t-page-header">
+  <h1 class="t-page-title"><i class="t-icon bi bi-speedometer2" aria-hidden="true"></i>Stats</h1>
+  <div class="t-page-actions"><span id="stats-updated" class="t-small t-muted"></span></div>
+</header>
 
-<div class="stats-grid mb-4">
-  <div class="card">
-    <div class="card-header d-flex align-items-center gap-2">
-      <h6 class="mb-0"><i class="bi bi-box-arrow-in-down me-2"></i>Ingest</h6>
-      <span id="ingest-badge" class="ms-auto"></span>
+<div class="t-grid stats-grid" data-min="md">
+  <div class="t-card">
+    <div class="t-card-header">
+      <h3 class="t-card-title"><i class="t-icon bi bi-box-arrow-in-down" aria-hidden="true"></i>Ingest</h3>
+      <span id="ingest-badge" class="card-header-end"></span>
     </div>
-    <div class="card-body">
+    <div class="t-card-body">
       <dl id="ingest-kv" class="kv"></dl>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-header d-flex align-items-center gap-2">
-      <h6 class="mb-0"><i class="bi bi-database me-2"></i>Database</h6>
-      <span id="db-governing" class="ms-auto"></span>
-      <button id="prune-btn" class="btn btn-sm btn-outline-warning" type="button"><i class="bi bi-scissors me-1"></i>Prune now</button>
+  <div class="t-card">
+    <div class="t-card-header">
+      <h3 class="t-card-title"><i class="t-icon bi bi-database" aria-hidden="true"></i>Database</h3>
+      <span class="card-header-end card-header-tools">
+        <span id="db-governing"></span>
+        <button id="prune-btn" class="t-btn" data-size="sm" data-tone="warning" type="button"><i class="t-icon bi bi-scissors" aria-hidden="true"></i>Prune now</button>
+      </span>
     </div>
-    <div class="card-body">
-      <div class="d-flex justify-content-between small mb-1">
-        <span id="db-size-label" class="stat-value">—</span>
-        <span id="db-size-pct" class="stat-sub"></span>
+    <div class="t-card-body">
+      <div class="stat-row">
+        <span id="db-size-label" class="t-stat-value">—</span>
+        <span id="db-size-pct" class="t-stat-sub"></span>
       </div>
-      <div class="progress progress-thin mb-3" role="progressbar" aria-label="Database size">
-        <div id="db-size-bar" class="progress-bar"></div>
+      <div class="t-progress db-progress" data-size="sm" role="progressbar" aria-label="Database size" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div id="db-size-bar" class="t-progress-bar" style="--t-value: 0%"></div>
       </div>
       <dl id="db-kv" class="kv"></dl>
     </div>
   </div>
 </div>
 
-<div class="section-label">Broker <span class="text-muted fw-normal text-lowercase">$SYS</span></div>
-<div id="sys-empty" class="d-none"></div>
-<div id="sys-groups" class="stats-grid stats-grid-dense mb-4"></div>
+<section class="t-section">
+  <h2 class="t-section-title">Broker <span class="t-muted section-title-sub">$SYS</span></h2>
+  <div id="sys-empty" hidden></div>
+  <div id="sys-groups" class="t-grid stats-grid" data-min="sm"></div>
+</section>
 
-<div id="sparks-section">
-  <div class="section-label">Last 24 hours</div>
-  <div id="sparks" class="spark-grid mb-4"></div>
-</div>
+<section id="sparks-section" class="t-section">
+  <h2 class="t-section-title">Last 24 hours</h2>
+  <div id="sparks" class="t-grid spark-grid" data-min="sm"></div>
+</section>
 
-<div class="card">
-  <div class="card-header d-flex align-items-center">
-    <button id="sys-all-toggle" class="collapse-toggle" type="button" aria-expanded="false">
-      <i class="bi bi-chevron-right"></i><h6 class="mb-0">All $SYS topics</h6>
-    </button>
-    <span id="sys-all-count" class="ms-auto small text-muted"></span>
-  </div>
-  <div id="sys-all" class="d-none">
-    <table class="table table-sm table-hover mb-0 data-table">
-      <thead><tr><th>Topic</th><th class="text-end">Value</th></tr></thead>
+<details id="sys-all-card" class="t-card t-section" data-variant="collapsible">
+  <summary class="t-card-header">
+    <h3 class="t-card-title"><i class="t-icon bi bi-list-ul" aria-hidden="true"></i>All $SYS topics</h3>
+    <span id="sys-all-count" class="card-header-end t-small t-muted"></span>
+  </summary>
+  <div id="sys-all" class="t-table-wrap">
+    <table class="t-table" data-variant="data" data-density="compact">
+      <thead><tr><th>Topic</th><th class="t-col-num">Value</th></tr></thead>
       <tbody id="sys-all-body"></tbody>
     </table>
   </div>
-</div>
+</details>

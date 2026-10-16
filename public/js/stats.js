@@ -67,8 +67,8 @@
   function renderIngest(ing, sseClients) {
     if (!ing) return;
     const badge = ing.connected
-      ? '<span class="badge badge-tint tint-green"><i class="bi bi-circle-fill me-1 status-dot status-dot--ok"></i>connected</span>'
-      : '<span class="badge badge-tint tint-red"><i class="bi bi-circle-fill me-1 status-dot status-dot--down"></i>disconnected</span>';
+      ? '<span class="t-badge" data-tone="success"><span class="t-dot" data-status="running"></span> connected</span>'
+      : '<span class="t-badge" data-tone="danger"><span class="t-dot" data-status="stopped"></span> disconnected</span>';
     $('ingest-badge').innerHTML = badge;
     const rows = [
       ['Broker', esc(`${ing.host ?? '—'}${ing.port ? `:${ing.port}` : ''}`)],
@@ -80,7 +80,7 @@
       ['Last message', esc(MS.fmtRel(ing.last_message_ms)), MS.fmtISO(ing.last_message_ms)]
     ];
     if (sseClients !== undefined) rows.push(['Live streams', esc(MS.fmtNum(sseClients))]);
-    if (ing.error) rows.push(['Last error', `<span class="text-danger">${esc(ing.error)}</span>`]);
+    if (ing.error) rows.push(['Last error', `<span class="t-tone-text" data-tone="danger">${esc(ing.error)}</span>`]);
     $('ingest-kv').innerHTML = kv(rows);
   }
 
@@ -89,15 +89,16 @@
     if (!db) return;
     const pct = db.max_bytes ? Math.min(100, (db.size_bytes / db.max_bytes) * 100) : 0;
     const bar = $('db-size-bar');
-    bar.style.width = `${pct.toFixed(1)}%`;
-    bar.className = `progress-bar ${pct >= 90 ? 'bar-down' : pct >= 70 ? 'bar-warn' : 'bar-ok'}`;
+    bar.style.setProperty('--t-value', `${pct.toFixed(1)}%`);
+    bar.dataset.tone = pct >= 90 ? 'danger' : pct >= 70 ? 'warning' : 'success';
+    bar.parentElement.setAttribute('aria-valuenow', Math.round(pct));
     $('db-size-label').textContent = `${MS.fmtBytes(db.size_bytes)} of ${MS.fmtBytes(db.max_bytes)}`;
     $('db-size-pct').textContent = `${pct < 1 ? pct.toFixed(2) : pct.toFixed(1)} %`;
 
-    const gov = { retention: ['tint-cyan', 'retention governs', 'Age limit is what deletes rows'],
-                  size: ['tint-orange', 'size governs', 'Size limit is what deletes rows'],
-                  none: ['tint-muted', 'within limits', 'Neither limit has been reached'] }[db.governing] || ['tint-muted', db.governing || '—', ''];
-    $('db-governing').innerHTML = `<span class="badge badge-tint ${gov[0]}" title="${esc(gov[2])}">${esc(gov[1])}</span>`;
+    const gov = { retention: ['cyan', 'retention governs', 'Age limit is what deletes rows'],
+                  size: ['orange', 'size governs', 'Size limit is what deletes rows'],
+                  none: ['neutral', 'within limits', 'Neither limit has been reached'] }[db.governing] || ['neutral', db.governing || '—', ''];
+    $('db-governing').innerHTML = `<span class="t-badge" data-tone="${gov[0]}" title="${esc(gov[2])}">${esc(gov[1])}</span>`;
 
     const rows = [
       ['Messages', esc(MS.fmtNum(db.messages))],
@@ -109,9 +110,9 @@
     if (prune) {
       const deleted = (prune.deleted_by_age || 0) + (prune.deleted_by_size || 0);
       rows.push(['Last prune', esc(prune.at_ms ? MS.fmtRel(prune.at_ms) : '—'), MS.fmtISO(prune.at_ms)]);
-      rows.push(['Pruned', `${esc(MS.fmtNum(deleted))} <span class="stat-sub">(${esc(MS.fmtNum(prune.deleted_by_age || 0))} age · ${esc(MS.fmtNum(prune.deleted_by_size || 0))} size · ${esc(MS.fmtNum(prune.duration_s, 2))} s)</span>`]);
+      rows.push(['Pruned', `${esc(MS.fmtNum(deleted))} <span class="t-stat-sub">(${esc(MS.fmtNum(prune.deleted_by_age || 0))} age · ${esc(MS.fmtNum(prune.deleted_by_size || 0))} size · ${esc(MS.fmtNum(prune.duration_s, 2))} s)</span>`]);
     } else {
-      rows.push(['Last prune', '<span class="stat-sub">not yet run</span>']);
+      rows.push(['Last prune', '<span class="t-stat-sub">not yet run</span>']);
     }
     $('db-kv').innerHTML = kv(rows);
   }
@@ -120,16 +121,16 @@
   function renderSys() {
     const sys = state.sys;
     const keys = Object.keys(sys);
-    $('sys-empty').classList.toggle('d-none', keys.length > 0);
-    $('sys-groups').classList.toggle('d-none', !keys.length);
+    $('sys-empty').hidden = keys.length > 0;
+    $('sys-groups').hidden = !keys.length;
     if (!keys.length) {
-      $('sys-empty').innerHTML = `<div class="card mb-4">${MS.empty('bi-hdd-rack', 'No $SYS data stored yet.', 'Needs $SYS/# in the broker subscriptions; values are sampled about once a minute.', false)}</div>`;
+      $('sys-empty').innerHTML = `<div class="t-card">${MS.empty('bi-hdd-rack', 'No $SYS data stored yet.', 'Needs $SYS/# in the broker subscriptions; values are sampled about once a minute.', false)}</div>`;
     }
     $('sys-groups').innerHTML = GROUPS.map((g) => {
       const rows = g.rows.filter(([k]) => sys[SYS + k] !== undefined).map(([k, label, fmt]) => [label, esc(fmt(sys[SYS + k])), SYS + k]);
       if (!rows.length) return '';
-      return `<div class="card"><div class="card-header"><h6 class="mb-0"><i class="bi ${g.icon} me-2"></i>${esc(g.title)}</h6></div>`
-        + `<div class="card-body"><dl class="kv">${kv(rows)}</dl></div></div>`;
+      return `<div class="t-card"><div class="t-card-header"><h3 class="t-card-title"><i class="t-icon bi ${g.icon}" aria-hidden="true"></i>${esc(g.title)}</h3></div>`
+        + `<div class="t-card-body"><dl class="kv">${kv(rows)}</dl></div></div>`;
     }).join('');
 
     $('sys-all-count').textContent = keys.length ? `${MS.fmtNum(keys.length)} topics` : '';
@@ -139,15 +140,15 @@
   function renderSysAll() {
     const keys = Object.keys(state.sys).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
     $('sys-all-body').innerHTML = keys.length
-      ? keys.map((k) => `<tr><td class="mono small">${esc(k)}</td><td class="mono small text-end">${esc(String(state.sys[k]).slice(0, 200))}</td></tr>`).join('')
+      ? keys.map((k) => `<tr><td class="t-mono t-small">${esc(k)}</td><td class="t-mono t-small t-col-num">${esc(String(state.sys[k]).slice(0, 200))}</td></tr>`).join('')
       : `<tr><td colspan="2">${MS.empty('bi-inbox', 'No $SYS topics yet.')}</td></tr>`;
   }
 
   // ─── Sparklines ─────────────────────────────────────────
   function buildSparkCards() {
-    $('sparks').innerHTML = SPARKS.map(([k, label], i) => `<div class="card spark-card">`
-      + `<div class="spark-head"><span class="stat-label">${esc(label)}</span><span class="stat-value" id="spark-now-${i}">—</span></div>`
-      + `<div class="spark-box" id="spark-${i}"></div></div>`).join('');
+    $('sparks').innerHTML = SPARKS.map(([k, label], i) => `<div class="t-card spark-card" data-variant="stat">`
+      + `<div class="spark-head"><span class="t-stat-label">${esc(label)}</span><span class="t-stat-value" id="spark-now-${i}">—</span></div>`
+      + `<div class="t-stat-box spark-box" id="spark-${i}"></div></div>`).join('');
   }
 
   async function loadSparks() {
@@ -209,10 +210,8 @@
     refresh();
     loadSparks();
     $('prune-btn').addEventListener('click', (e) => prune(e.currentTarget));
-    $('sys-all-toggle').addEventListener('click', (e) => {
-      state.allOpen = !state.allOpen;
-      e.currentTarget.setAttribute('aria-expanded', String(state.allOpen));
-      $('sys-all').classList.toggle('d-none', !state.allOpen);
+    $('sys-all-card').addEventListener('toggle', (e) => {
+      state.allOpen = e.currentTarget.open;
       if (state.allOpen) renderSysAll();
     });
 

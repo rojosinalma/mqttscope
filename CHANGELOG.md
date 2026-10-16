@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-16
+
+### Changed
+
+- The UI runs on [tailor](https://github.com/rojosinalma/tailor): one markup vocabulary rendered by
+  eight switchable skins (Bootstrap look by default) and 21 colour palettes (Dracula by default), with a
+  light/dark toggle. Skin, palette and mode are picked in the navbar and remembered per browser. The
+  vendored assets live under `public/tailor/` (managed by `tailor sync`); Bootstrap and `dracula.css`
+  are gone, Bootstrap Icons are served locally instead of from a CDN.
+- Modals, toasts and tabs are native `<dialog>` elements and tailor behaviour instead of Bootstrap JS.
+
 ## [0.2.1] - 2026-10-16
 
 ### Changed
@@ -46,7 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Retention by age (`retention_days`) and database size (`max_db_bytes`).
 - Docker Compose quick start.
 
-[Unreleased]: https://github.com/rojosinalma/mqttscope/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/rojosinalma/mqttscope/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/rojosinalma/mqttscope/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/rojosinalma/mqttscope/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/rojosinalma/mqttscope/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/rojosinalma/mqttscope/releases/tag/v0.1.0

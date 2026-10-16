@@ -210,8 +210,8 @@
 
   function leafBadges(e) {
     let html = '';
-    if (e.retained) html += '<span class="badge badge-xs badge-tint tint-purple" title="Last message was retained">retained</span>';
-    if (e.rate > 0.0005) html += `<span class="badge badge-xs badge-tint tint-cyan" title="Messages per second over the rate window">${esc(MS.fmtRate(e.rate))}</span>`;
+    if (e.retained) html += '<span class="t-badge" data-size="xs" data-tone="purple" title="Last message was retained">retained</span>';
+    if (e.rate > 0.0005) html += `<span class="t-badge" data-size="xs" data-tone="cyan" title="Messages per second over the rate window">${esc(MS.fmtRate(e.rate))}</span>`;
     return html;
   }
 
@@ -267,7 +267,7 @@
 
     const scroll = box.scrollTop;
     let html = `<ul class="tree">${sortNodes(root.children.values(), 0).map((c) => `<li>${renderNode(c)}</li>`).join('')}</ul>`;
-    if (skipped) html += `<div class="empty-state compact">${MS.fmtNum(skipped)} more topics not shown — refine the filter.</div>`;
+    if (skipped) html += `<div class="t-empty" data-size="sm">${MS.fmtNum(skipped)} more topics not shown — refine the filter.</div>`;
     box.innerHTML = html;
     box.scrollTop = scroll;
 
@@ -326,11 +326,11 @@
   // ─── Timeline ───────────────────────────────────────────
   function rowBadges(m) {
     let b = '';
-    if (m.retained) b += '<span class="badge badge-xs badge-tint tint-purple">retained</span>';
-    if (m.origin === 'ui') b += '<span class="badge badge-xs badge-tint tint-pink" title="Published from mqttscope">ui</span>';
-    if (m.dup_count > 0) b += `<span class="badge badge-xs badge-tint tint-orange" title="Received ${m.dup_count + 1} times; ${m.dup_count} identical repeats folded into this row">×${m.dup_count + 1}</span>`;
-    if (!m.stored) b += '<span class="badge badge-xs badge-tint tint-muted" title="Seen live but not stored (sampling or dedup)">not stored</span>';
-    if (m.truncated) b += '<span class="badge badge-xs badge-tint tint-yellow" title="Stored truncated to max_payload_bytes">truncated</span>';
+    if (m.retained) b += '<span class="t-badge" data-size="xs" data-tone="purple">retained</span>';
+    if (m.origin === 'ui') b += '<span class="t-badge" data-size="xs" data-tone="pink" title="Published from mqttscope">ui</span>';
+    if (m.dup_count > 0) b += `<span class="t-badge" data-size="xs" data-tone="orange" title="Received> ${m.dup_count + 1} times; ${m.dup_count} identical repeats folded into this row">×${m.dup_count + 1}</span>`;
+    if (!m.stored) b += '<span class="t-badge" data-size="xs" data-tone="neutral" title="Seen live but not stored (sampling or dedup)">not stored</span>';
+    if (m.truncated) b += '<span class="t-badge" data-size="xs" data-tone="yellow" title="Stored truncated to max_payload_bytes">truncated</span>';
     return b;
   }
 
@@ -365,12 +365,12 @@
     const meta = $('tl-meta');
     if (!S.selected) {
       title.textContent = 'No topic selected';
-      title.classList.add('text-muted');
+      title.classList.add('t-muted');
       meta.innerHTML = '';
       return;
     }
     title.textContent = S.selected;
-    title.classList.remove('text-muted');
+    title.classList.remove('t-muted');
     const e = S.topics.get(S.selected);
     const bits = [];
     if (e) {
@@ -378,7 +378,7 @@
       if (e.stored !== null && e.stored !== undefined) bits.push(`<span>${MS.fmtNum(e.stored)} stored</span>`);
       bits.push(`<span>${esc(MS.fmtRate(e.rate))}</span>`);
       if (e.last_seen_ms) bits.push(`<span title="${esc(MS.fmtISO(e.last_seen_ms))}">last ${esc(MS.fmtRel(e.last_seen_ms))}</span>`);
-      if (e.retained) bits.push('<span class="badge badge-xs badge-tint tint-purple">retained</span>');
+      if (e.retained) bits.push('<span class="t-badge" data-size="xs" data-tone="purple">retained</span>');
     }
     meta.innerHTML = bits.join('');
   }
@@ -391,7 +391,7 @@
     else if (!bounds().live) parts.push('history only');
     else parts.push('live');
     st.textContent = parts.join(' · ');
-    $('load-more').classList.toggle('d-none', !S.hasMore);
+    $('load-more').hidden = !S.hasMore;
   }
 
   async function loadHistory({ keepSelection } = {}) {
@@ -402,7 +402,7 @@
     const b = bounds();
     S.pending = [];
     S.missed = 0;
-    $('timeline').innerHTML = '<div class="empty-state compact"><span class="spinner-border spinner-border-sm"></span></div>';
+    $('timeline').innerHTML = MS.loading();
     try {
       const res = await MS.getJSON(`/api/messages${MS.qs({ topic, from_ms: b.from_ms, to_ms: b.to_ms, limit: S.pageSize })}`, { signal: ctl.signal });
       if (topic !== S.selected) return;
@@ -550,14 +550,14 @@
   function renderMeta() {
     const box = $('detail-meta');
     const m = S.selectedMsg;
-    $('copy-btn').classList.toggle('d-none', !m || m.binary);
-    if (!m) { box.classList.add('d-none'); box.innerHTML = ''; return; }
-    box.classList.remove('d-none');
+    $('copy-btn').hidden = !m || m.binary;
+    if (!m) { box.hidden = true; box.innerHTML = ''; return; }
+    box.hidden = false;
     const bits = [
       `<span class="meta-time" title="${esc(MS.fmtISO(m.ts_ms))}">${MS.isToday(m.ts_ms) ? '' : `${MS.fmtDay(m.ts_ms)} `}${MS.fmtClock(m.ts_ms)}</span>`,
       `<span>${MS.fmtBytes(m.size)}</span>`,
       `<span>QoS ${esc(m.qos)}</span>`,
-      m.id !== null ? `<span class="mono">#${esc(m.id)}</span>` : '',
+      m.id !== null ? `<span class="t-mono">#${esc(m.id)}</span>` : '',
       rowBadges(m)
     ];
     box.innerHTML = bits.join('');
@@ -586,7 +586,7 @@
         body = `<pre class="payload">${esc(m.payload)}</pre>`;
       }
     }
-    const trunc = m.truncated ? ' · <span class="text-orange">stored truncated</span>' : '';
+    const trunc = m.truncated ? ' · <span class="t-tone-text" data-tone="orange">stored truncated</span>' : '';
     box.innerHTML = `<div class="payload-kind">${esc(kind)}${trunc}</div>${body}`;
   }
 
@@ -618,7 +618,7 @@
     const box = $('tab-diff');
     const d = res.diff;
     if (!res.from) { box.innerHTML = MS.empty('bi-1-circle', 'First stored message on this topic — nothing to compare.', null, false); return; }
-    const vs = `<span class="text-muted">vs ${esc(MS.fmtDateTime(res.from.ts_ms))}.${String(new Date(res.from.ts_ms).getMilliseconds()).padStart(3, '0')}${res.from.id !== undefined ? ` · #${esc(res.from.id)}` : ''}</span>`;
+    const vs = `<span class="t-muted">vs ${esc(MS.fmtDateTime(res.from.ts_ms))}.${String(new Date(res.from.ts_ms).getMilliseconds()).padStart(3, '0')}${res.from.id !== undefined ? ` · #${esc(res.from.id)}` : ''}</span>`;
     if (!d || d.kind === 'same') { box.innerHTML = `<div class="diff-summary">${vs}</div>${MS.empty('bi-check2-all', 'Identical to the previous stored message.')}`; return; }
     if (d.kind === 'binary') {
       box.innerHTML = `<div class="diff-summary">${esc(d.summary || 'Binary payloads differ')} ${vs}</div>`
@@ -637,7 +637,7 @@
     if (m.id === null) { box.innerHTML = MS.empty('bi-file-diff', 'This message was not stored, so it has no diff.', 'Diffs compare stored messages; sampling or dedup skipped this one.', false); return; }
     const cached = S.diffCache.get(m.id);
     if (cached) { renderDiffResult(cached); return; }
-    box.innerHTML = '<div class="empty-state compact"><span class="spinner-border spinner-border-sm"></span></div>';
+    box.innerHTML = MS.loading();
     try {
       const res = await MS.getJSON(`/api/diff${MS.qs({ id: m.id })}`);
       S.diffCache.set(m.id, res);
@@ -667,7 +667,7 @@
     $('chart-box').innerHTML = '';
     const el = $('chart-empty');
     el.innerHTML = MS.empty(icon, text, hint, false);
-    el.classList.remove('d-none');
+    el.hidden = false;
   }
 
   async function loadPaths() {
@@ -700,13 +700,13 @@
     const b = bounds();
     const box = $('chart-box');
     const maxPoints = Math.max(100, Math.min(2000, box.clientWidth || 600));
-    $('chart-empty').classList.add('d-none');
+    $('chart-empty').hidden = true;
     try {
       const res = await MS.getJSON(`/api/series${MS.qs({ topic, path: path === '' ? '.' : path, from_ms: b.from_ms, to_ms: b.to_ms ?? Date.now(), max_points: maxPoints })}`);
       if (topic !== S.selected || S.tab !== 'chart' || $('chart-path').value !== path) return;
       const data = MS.toColumns(res.points);
       if (!data[0].length) { chartEmpty('bi-graph-down', 'No stored values for this path in the range.', 'Try a wider range.'); return; }
-      $('chart-empty').classList.add('d-none');
+      $('chart-empty').hidden = true;
       S.chart?.destroy();
       const pane = $('tab-chart');
       const height = Math.max(160, pane.clientHeight - $('chart-path').offsetHeight - 80);
@@ -737,8 +737,12 @@
   // ─── Selection ──────────────────────────────────────────
   function showTab(tab) {
     S.tab = tab;
-    document.querySelectorAll('.pane-tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
-    ['payload', 'diff', 'chart'].forEach((t) => $(`tab-${t}`).classList.toggle('d-none', t !== tab));
+    document.querySelectorAll('.pane-tabs [role="tab"]').forEach((b) => {
+      const on = b.dataset.tab === tab;
+      b.setAttribute('aria-selected', on);
+      b.tabIndex = on ? 0 : -1;
+    });
+    ['payload', 'diff', 'chart'].forEach((t) => { $(`tab-${t}`).hidden = t !== tab; });
     if (tab === 'payload') renderPayload();
     else if (tab === 'diff') renderDiff();
     else renderChart();
@@ -789,9 +793,10 @@
   function resetPublishConfirm() {
     pubConfirm = false;
     const btn = $('pub-submit');
-    btn.className = 'btn btn-primary';
-    btn.innerHTML = '<i class="bi bi-send me-1"></i>Publish';
-    $('pub-confirm-text').classList.add('d-none');
+    btn.dataset.variant = 'primary';
+    delete btn.dataset.tone;
+    btn.innerHTML = '<i class="t-icon bi bi-send" aria-hidden="true"></i>Publish';
+    $('pub-confirm-text').hidden = true;
   }
 
   function payloadHint() {
@@ -814,7 +819,9 @@
     $('pub-qos').value = '0';
     resetPublishConfirm();
     payloadHint();
-    bootstrap.Modal.getOrCreateInstance($('publish-modal')).show();
+    const dlg = $('publish-modal');
+    if (!dlg.open) dlg.showModal();
+    $('pub-topic').focus();
   }
 
   async function submitPublish(ev) {
@@ -828,18 +835,19 @@
     if (!pubConfirm) {
       pubConfirm = true;
       const btn = $('pub-submit');
-      btn.className = 'btn btn-warning';
-      btn.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>Confirm publish';
+      btn.dataset.variant = 'solid';
+      btn.dataset.tone = 'warning';
+      btn.innerHTML = '<i class="t-icon bi bi-exclamation-triangle" aria-hidden="true"></i>Confirm publish';
       const t = $('pub-confirm-text');
       t.textContent = `Send ${MS.fmtBytes(new TextEncoder().encode(payload).length)} to ${topic} (QoS ${qos}${retain ? ', retained' : ''})?`;
-      t.classList.remove('d-none');
+      t.hidden = false;
       return;
     }
     const btn = $('pub-submit');
     await MS.busy(btn, async () => {
       const res = await MS.postAction('/api/publish', { topic, payload, retain, qos });
       MS.toastResult(res);
-      if (res.ok) bootstrap.Modal.getInstance($('publish-modal'))?.hide();
+      if (res.ok) $('publish-modal').close();
     });
     resetPublishConfirm();
   }
@@ -864,8 +872,9 @@
     const summary = $('search-summary');
     const results = $('search-results');
     summary.textContent = `Searching “${q}”${scoped ? ` in ${S.selected}` : ''}…`;
-    results.innerHTML = '<div class="empty-state compact"><span class="spinner-border spinner-border-sm"></span></div>';
-    bootstrap.Modal.getOrCreateInstance($('search-modal')).show();
+    results.innerHTML = MS.loading();
+    const dlg = $('search-modal');
+    if (!dlg.open) dlg.showModal();
     try {
       const res = await MS.getJSON(`/api/search${MS.qs({ q, topic: scoped ? S.selected : null, from_ms: b.from_ms, to_ms: b.to_ms })}`);
       const list = res.results || [];
@@ -878,7 +887,7 @@
         + `<div class="search-snippet">${markTerms(r.snippet ?? '', q)}</div></button>`).join('');
       results.querySelectorAll('.search-result').forEach((el) => el.addEventListener('click', () => {
         const r = list[Number(el.dataset.i)];
-        bootstrap.Modal.getInstance($('search-modal'))?.hide();
+        $('search-modal').close();
         selectTopic(r.topic, { messageId: r.id });
       }));
     } catch (e) {
@@ -895,7 +904,7 @@
 
   function applyRange() {
     MS.save('ms.range', S.range);
-    $('custom-range').classList.toggle('d-none', S.range !== 'custom');
+    $('custom-range').hidden = S.range !== 'custom';
     loadHistory({ keepSelection: true });
     if (S.tab === 'chart') renderChart();
   }
@@ -903,8 +912,9 @@
   function togglePause() {
     S.paused = !S.paused;
     const btn = $('pause-btn');
-    btn.classList.toggle('paused', S.paused);
-    btn.innerHTML = S.paused ? '<i class="bi bi-play-fill"></i><span class="ms-1">Resume</span>' : '<i class="bi bi-pause-fill"></i><span class="ms-1">Pause</span>';
+    btn.setAttribute('aria-pressed', S.paused);
+    if (S.paused) btn.dataset.tone = 'warning'; else delete btn.dataset.tone;
+    btn.innerHTML = S.paused ? '<i class="t-icon bi bi-play-fill" aria-hidden="true"></i><span>Resume</span>' : '<i class="t-icon bi bi-pause-fill" aria-hidden="true"></i><span>Pause</span>';
     btn.title = S.paused ? 'Resume live updates' : 'Pause live updates';
     if (!S.paused && S.missed) loadHistory({ keepSelection: true });
     S.missed = 0;
@@ -966,7 +976,7 @@
     } catch {
       S.publishEnabled = true;
     }
-    $('publish-btn').classList.toggle('d-none', !S.publishEnabled);
+    $('publish-btn').hidden = !S.publishEnabled;
   }
 
   // ─── Wiring ─────────────────────────────────────────────
@@ -1013,7 +1023,8 @@
     });
     $('load-more').addEventListener('click', (ev) => loadMore(ev.currentTarget));
 
-    document.querySelectorAll('.pane-tab').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
+    // Tailor.tabs owns click/keyboard on the tab list and emits t:change; keep our state in sync.
+    document.querySelector('.pane-tabs').addEventListener('t:change', (ev) => { if (ev.detail?.tab) showTab(ev.detail.tab.dataset.tab); });
     $('chart-path').addEventListener('change', (ev) => {
       if (S.selected) { S.chartPathByTopic[S.selected] = ev.target.value; MS.save('ms.chartPath', S.chartPathByTopic); }
       renderChart();
@@ -1030,7 +1041,7 @@
     range.value = S.range;
     range.addEventListener('change', () => {
       if (range.value === 'custom') {
-        $('custom-range').classList.remove('d-none');
+        $('custom-range').hidden = false;
         const b = bounds();
         $('range-from').value = toLocalInput(b.from_ms);
         $('range-to').value = toLocalInput(Date.now());
@@ -1053,7 +1064,7 @@
     $('publish-btn').addEventListener('click', openPublish);
     $('publish-form').addEventListener('submit', submitPublish);
     ['pub-topic', 'pub-payload', 'pub-retain', 'pub-qos'].forEach((id) => $(id).addEventListener('input', () => { resetPublishConfirm(); if (id === 'pub-payload') payloadHint(); }));
-    $('publish-modal').addEventListener('hidden.bs.modal', resetPublishConfirm);
+    $('publish-modal').addEventListener('close', resetPublishConfirm);
     $('search-form').addEventListener('submit', runSearch);
 
     setInterval(() => {
