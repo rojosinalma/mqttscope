@@ -23,7 +23,7 @@
   <link href="<%= asset("css/app.css") %>" rel="stylesheet">
 </head>
 <body>
-<div class="t-shell" data-sidebar="none">
+<div class="t-shell">
   <header class="t-navbar t-shell-nav app-navbar">
     <a class="t-navbar-brand" href="/"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-broadcast"/></svg>mqttscope</a>
     <span id="conn-indicator" class="conn-indicator" title="Broker connection: checking…">
@@ -47,8 +47,8 @@
 
   <footer class="t-footer t-shell-foot">
     <div class="t-footer-end">
+      <div data-tailor-pickers="mode"></div>
       <span class="t-footer-version">mqttscope <%= APP_VERSION %></span>
-      <div data-tailor-pickers></div>
     </div>
   </footer>
 </div>

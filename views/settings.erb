@@ -68,6 +68,7 @@
 <% panes.each_with_index do |(id, icon, label, _), i| -%>
       <li><button class="t-sidebar-item"<%= ' aria-current="page"' if i.zero? %> type="button" data-pane="<%= id %>"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-<%= icon %>"/></svg><span class="t-sidebar-item-name"><%= label %></span></button></li>
 <% end -%>
+      <li><button class="t-sidebar-item" type="button" data-pane="appearance"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-palette"/></svg><span class="t-sidebar-item-name">Appearance</span></button></li>
     </ul>
   </nav>
 
@@ -146,5 +147,17 @@
       </div>
     </form>
 <% end -%>
+    <div class="settings-pane" hidden data-pane="appearance">
+      <section class="t-section">
+      <h2 class="t-section-title">Appearance</h2>
+      <div class="t-settings">
+        <div class="t-setting">
+          <div class="t-setting-label"><span>Appearance</span>
+            <span class="t-help" data-tone="info"><button class="t-help-btn" type="button" aria-expanded="false" aria-label="About appearance">i</button><div class="t-help-box" hidden><p>Skin and colour palette of this UI. Light/dark is the sun/moon toggle in the footer.</p></div></span></div>
+          <div class="t-setting-control"><div data-tailor-pickers="skin palette"></div></div>
+        </div>
+      </div>
+      </section>
+    </div>
   </div>
 </div>
