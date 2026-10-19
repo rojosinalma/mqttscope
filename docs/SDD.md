@@ -51,7 +51,9 @@ schema in `db/migrations/`:
   `dup_count` counts consecutive identical payloads collapsed into this row; `truncated` marks
   payloads cut at `max_payload_bytes`.
 - `messages_fts` — an external-content FTS5 table over `payload`, kept in step by insert/delete
-  triggers, with `secure-delete` so pruned payloads leave no trace in the index.
+  triggers. Deletes append tombstones; the pruner merges segments to drop them. FTS `secure-delete`
+  (migration 003) was reverted in 004 on 2026-10-19: it scrubbed tokens one by one and took 0.25 s
+  per 20 KB row, which froze the process for 20 min per 5000-row batch.
 
 In memory: the TopicRegistry (every topic seen, stored or not, with a rate ring per topic), the
 Sampling state (last stored payload digest and timestamp per topic), the Ingest echo table (recent
@@ -101,11 +103,18 @@ down (503); QoS 2 is refused because the client library has no QoS 2 handshake. 
 Ingest remembers a digest of the message for `publish_echo_ttl_s`; when the broker echoes it back,
 the stored row and the `message` event carry `origin: ui`.
 
-**Retention.** The Pruner wakes every `prune_interval_s`: delete rows older than `retention_days`,
-then while `Store.db_size_bytes > max_db_bytes` delete the oldest `prune_batch` rows and run
-`PRAGMA incremental_vacuum`, then drop stale empty `topics` rows. `Pruner.run_now` is
-mutex-coalesced so an API-triggered run and the timer never overlap. `GET /api/stats` reports which
-limit is governing.
+**Retention.** The Pruner wakes every `prune_interval_s`: delete rows older than `retention_days`
+in `prune_batch` steps; if `Store.used_bytes > max_db_bytes`, delete the oldest rows down to
+`prune_target_pct` of the cap in rounds of delete → FTS merge → vacuum (deleted rows free their FTS
+entries only after a merge, so each round deletes a proportional slice and measures again); under
+the cap merge at most `prune_merge_pages` FTS pages; then drop stale empty `topics` rows and
+checkpoint the WAL. Every statement is short (small batches, 4 MB vacuum steps, 256-page FTS merge
+steps) with a 20 ms sleep between steps, because the sqlite3 gem holds the GVL while a statement
+runs and a thread that re-takes the GVL at once starves the others: one long statement, or a tight
+loop of short ones, stalls ingest, the MQTT keepalive and the health check. Lock waits use `busy_handler_timeout`, which
+sleeps in Ruby and releases the GVL. `Pruner.run_now` is mutex-coalesced so an API-triggered run
+and the timer never overlap. `GET /api/stats` reports which limit is governing; the container
+health check uses `GET /api/healthz`, which only pings the database.
 
 **Settings.** `Setting.fetch` reads the table at use time, so every tunable applies on the next
 message or request. `POST /api/settings` validates each key (JSON rules, integers, MQTT filters,

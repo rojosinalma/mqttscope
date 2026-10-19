@@ -28,7 +28,7 @@ EXPOSE 9292
 
 USER app
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD curl -fsS "http://localhost:${PORT:-9292}/api/stats" >/dev/null || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
+  CMD curl -fsS "http://localhost:${PORT:-9292}/api/healthz" >/dev/null || exit 1
 
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "config.ru"]

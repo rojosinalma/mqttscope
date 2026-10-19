@@ -92,12 +92,15 @@ Message hash: `{id:, topic:, ts_ms:, payload:, size:, retained:, qos:, origin:, 
 
 ```ruby
 Pruner.start          # idempotent; sleeps prune_interval_s between runs
-Pruner.run_now        # -> {deleted_by_age:, deleted_by_size:, size_before:, size_after:, duration_s:}; mutex-coalesced
+Pruner.run_now        # -> {deleted_by_age:, deleted_by_size:, topics_dropped:, fts_merges:, size_before:, size_after:, duration_s:}; mutex-coalesced
 Pruner.last_run       # the last result + :at_ms, or nil
+Pruner.running?       # true while a run holds the lock
 ```
 
-Age rule first, then while `db_size_bytes > max_db_bytes` delete the oldest `prune_batch` rows;
-`PRAGMA incremental_vacuum` after each batch. Also drops `topics` rows with no messages and not
+Age rule first in `prune_batch` steps; then, if `used_bytes > max_db_bytes`, delete the oldest rows
+down to `prune_target_pct` of the cap in rounds of delete → FTS merge → vacuum (three at most).
+Under the cap, merge at most `prune_merge_pages` FTS pages. Every SQL statement is short so the
+write lock and the GVL are never held for long. Also drops `topics` rows with no messages and not
 seen for `retention_days`.
 
 ## Differ (`lib/differ.rb`) — reloadable, pure

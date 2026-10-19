@@ -185,6 +185,7 @@ class StoreTest < Minitest::Test
 
   def test_prune_by_size
     assert_equal 2, DB.fetch("PRAGMA auto_vacuum").single_value
+    assert_equal 0, DB.fetch("SELECT v FROM messages_fts_config WHERE k = 'secure-delete'").single_value
     Setting.set("max_payload_bytes", 1_000_000)
     rng = Random.new(1)
     400.times { |i| rec("big/#{i % 4}", rng.bytes(5_000).unpack1("H*"), NOW + i) }

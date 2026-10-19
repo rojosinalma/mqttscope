@@ -30,7 +30,9 @@
     if (ms === null || ms === undefined) return '—';
     return MS.isToday(ms) ? MS.fmtClock(ms, false) : `${MS.fmtDay(ms)} ${MS.fmtClock(ms, false)}`;
   };
-  MS.fmtISO = (ms) => (ms === null || ms === undefined ? '' : new Date(ms).toLocaleString());
+  // Some browsers report an invalid default locale (e.g. "en-US@posix"); fall back to en-US.
+  const locale = (() => { try { new Intl.NumberFormat(); return undefined; } catch { return 'en-US'; } })();
+  MS.fmtISO = (ms) => (ms === null || ms === undefined ? '' : new Date(ms).toLocaleString(locale));
 
   MS.fmtDuration = (sec) => {
     sec = Math.max(0, Math.round(sec));
@@ -59,7 +61,7 @@
   MS.fmtNum = (n, digits = 0) => {
     n = Number(n);
     if (!Number.isFinite(n)) return '—';
-    return n.toLocaleString(undefined, { maximumFractionDigits: digits });
+    return n.toLocaleString(locale, { maximumFractionDigits: digits });
   };
   MS.fmtRate = (r) => {
     r = Number(r) || 0;

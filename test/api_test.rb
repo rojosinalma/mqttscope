@@ -164,6 +164,13 @@ class ApiTest < Minitest::Test
     assert body.key?("sse_clients")
   end
 
+  def test_healthz
+    status, body = get("/api/healthz")
+    assert_equal 200, status
+    assert_equal false, body["prune_running"]
+    assert body.key?("connected")
+  end
+
   def test_stream_rejects_bad_filter
     assert_equal 400, get("/api/stream?topics=a/%23/b").first
   end

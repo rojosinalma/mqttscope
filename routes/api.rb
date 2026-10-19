@@ -55,6 +55,12 @@ class App
       end
     end
 
+    # Liveness for the container health check: cheap on purpose (no table scans).
+    r.get "healthz" do
+      DB.get(1)
+      json_ok("ok", connected: ::Ingest.status[:connected], prune_running: ::Pruner.running?)
+    end
+
     r.on "devices" do
       r.get String, "timeline" do |id|
         from_ms, to_ms = api_window

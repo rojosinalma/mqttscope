@@ -20,6 +20,8 @@ module SettingsValidator
     "max_db_bytes" => (1024 * 1024)..(16 * 1024**4),
     "prune_interval_s" => 60..(7 * 86_400),
     "prune_batch" => 100..1_000_000,
+    "prune_target_pct" => 50..100,
+    "prune_merge_pages" => 0..10_000_000,
     "max_topics" => 100..10_000_000,
     "rate_window_s" => 6..86_400,
     "sse_max_clients" => 1..1000,

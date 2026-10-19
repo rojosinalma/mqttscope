@@ -27,7 +27,9 @@
         number.("retention_days", "Retention", nil, unit: "days", min: 1),
         { key: "max_db_bytes", label: "Max database size", kind: "gb", unit: "GB", help: "Always enforced; the oldest messages go first." },
         number.("prune_interval_s", "Prune interval", nil, unit: "s", min: 60),
-        number.("prune_batch", "Prune batch", "Rows per delete batch.", unit: "rows", min: 1)
+        number.("prune_batch", "Prune batch", "Rows per delete batch; small batches keep the write lock short.", unit: "rows", min: 100),
+        number.("prune_target_pct", "Prune target", "Once over the cap, prune down to this share of it.", unit: "%", min: 50),
+        number.("prune_merge_pages", "Search index merge", "FTS pages merged per prune run to drop deleted entries; 0 disables.", unit: "pages")
       ]]
     ]],
     ["streams", "broadcast-pin", "Streams", [

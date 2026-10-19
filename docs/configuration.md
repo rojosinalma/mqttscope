@@ -49,7 +49,9 @@ saved through the API.
 | `retention_days` | `7` | delete stored messages older than this |
 | `max_db_bytes` | `10737418240` | 10 GB; always enforced |
 | `prune_interval_s` | `3600` | seconds between prune runs |
-| `prune_batch` | `5000` | rows per delete batch |
+| `prune_batch` | `500` | rows per delete batch; each batch holds the write lock, so keep it small |
+| `prune_target_pct` | `90` | once over `max_db_bytes`, prune down to this share of it |
+| `prune_merge_pages` | `10000` | FTS index pages merged per prune run to drop deleted entries; `0` disables |
 | `max_topics` | `20000` | in-memory topic registry cap (LRU eviction) |
 | `rate_window_s` | `60` | window for the msgs/s figures |
 | `sse_max_clients` | `12` | concurrent SSE streams; keep it below Puma's max threads (16), each stream holds one |
@@ -107,9 +109,14 @@ Timelines treat silence longer than `stale_s` as offline.
 
 Messages are kept for **7 days or until the database reaches 10 GB, whichever comes first**
 (`retention_days`, `max_db_bytes`). Each prune run first deletes everything older than the age
-limit, then, if the file is still over the size cap, deletes the oldest messages in batches of
-`prune_batch` until it fits, running `PRAGMA incremental_vacuum` after each batch. It also drops
-`topics` rows with no stored messages that have not been seen for `retention_days`.
+limit in batches of `prune_batch`. If the database is still over the size cap it deletes the oldest
+messages down to `prune_target_pct` of the cap: a deleted row frees its content pages at once but
+its search-index entries only after an FTS merge, so each round deletes a proportional slice, merges
+the index and vacuums before it measures again (three rounds at most). Under the cap, a run merges
+at most `prune_merge_pages` index pages. Every step is short (small batches, 4 MB vacuum steps,
+256-page FTS merge steps) with a 20 ms pause between steps, so ingest and the UI keep running while
+the pruner works. It also drops `topics` rows with no stored messages that have not been seen for
+`retention_days`.
 
 The size cap is always enforced, so under a heavy load history may be shorter than 7 days;
 `GET /api/stats` reports which limit is currently governing (`db.governing`), and `POST /api/prune`

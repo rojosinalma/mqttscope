@@ -17,13 +17,14 @@ reason in `message`. Timestamps are Integer **milliseconds since epoch** (`ts_ms
 | GET | `/api/paths?topic=` | `paths` — numeric JSON paths of the topic's last payload |
 | GET | `/api/search?q=&topic=&from_ms=&to_ms=&limit=` | `results` — `{id, topic, ts_ms, snippet, size}` (FTS5; `topic` may be a wildcard filter) |
 | GET | `/api/stats` | `ingest`, `db`, `sys` (latest `$SYS` payloads), `sse_clients`, `prune` (last run) |
+| GET | `/api/healthz` | `connected`, `prune_running`; cheap liveness probe for the container health check |
 | GET | `/api/stats/series?topic=$SYS/…&from_ms=&to_ms=&max_points=` | `points` (alias of `/api/series`) |
 | GET | `/api/devices` | `devices` |
 | GET | `/api/devices/:id/timeline?from_ms=&to_ms=` | `timeline` — `[{from_ms, to_ms, online}]` |
 | POST | `/api/publish` `{topic, payload, retain?, qos?}` | `ok`; 403 when `publish_enabled` is off, 503 when the broker is not connected; QoS 0 or 1 |
 | GET | `/api/settings` | `settings` — `{key: value}`, `mqtt_pass` masked as `••••` unless empty |
 | POST | `/api/settings` `{key: value, …}` | `ok`; validates JSON rules, integers and filters; an unchanged `••••` leaves `mqtt_pass` alone; reconnects when connection keys changed |
-| POST | `/api/prune` | `ok` plus the prune result (`deleted_by_age`, `deleted_by_size`, `size_before`, `size_after`, `duration_s`) |
+| POST | `/api/prune` | `ok` plus the prune result (`deleted_by_age`, `deleted_by_size`, `topics_dropped`, `fts_merges`, `size_before`, `size_after`, `duration_s`) |
 | POST | `/api/reconnect` | `ok`; drops the broker connection, the ingest loop reconnects with current settings |
 | GET | `/api/stream?topics=<comma filters>` | Server-Sent Events, see below (default filter `#`) |
 

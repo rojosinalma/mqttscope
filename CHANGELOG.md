@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-10-19
+
+### Fixed
+
+- The pruner froze the whole process for about 20 minutes per 5000-row batch once the database hit
+  `max_db_bytes`: FTS5 `secure-delete` scrubbed every token of every deleted row (0.25 s per 20 KB row),
+  and the sqlite3 gem holds the GVL while a statement runs, so ingest lost messages with `database is
+  locked`, the MQTT keepalive lapsed and the health check timed out. Migration 004 turns `secure-delete`
+  off; the pruner now works in short steps (500-row batches, 4 MB vacuum steps, 256-page FTS merge
+  steps) and reclaims deleted index entries with bounded merges.
+- Lock waits use `busy_handler_timeout`, which sleeps in Ruby and lets other threads run.
+- `MS.fmtISO` and `MS.fmtNum` no longer throw under a browser locale that `Intl` rejects (such as
+  `en-US@posix`); they fall back to `en-US`.
+
+### Added
+
+- `GET /api/healthz`, a cheap liveness probe; the container health check uses it instead of `/api/stats`.
+- Settings `prune_target_pct` (prune down to this share of the cap once over it, default 90) and
+  `prune_merge_pages` (FTS pages merged per run, default 10000). `prune_batch` defaults to 500.
+
 ## [0.3.1] - 2026-10-16
 
 ### Changed
@@ -68,7 +88,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Retention by age (`retention_days`) and database size (`max_db_bytes`).
 - Docker Compose quick start.
 
-[Unreleased]: https://github.com/rojosinalma/mqttscope/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/rojosinalma/mqttscope/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/rojosinalma/mqttscope/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/rojosinalma/mqttscope/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/rojosinalma/mqttscope/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/rojosinalma/mqttscope/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/rojosinalma/mqttscope/compare/v0.1.0...v0.2.0
