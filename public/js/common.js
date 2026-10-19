@@ -174,7 +174,7 @@
     }
     dot.dataset.status = status;
     label.textContent = text;
-    ind.title = title;
+    ind.dataset.tip = title;
 
     const banner = document.getElementById('conn-banner');
     if (banner) {

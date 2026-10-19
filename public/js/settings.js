@@ -34,9 +34,9 @@
     return `<tr>${cols.map((c) => `<td><input class="t-input t-mono${c.type === 'int' ? ' rule-num' : ''}" data-size="sm" type="${c.type === 'int' ? 'number' : 'text'}"`
       + ` data-col="${c.key}" value="${esc(rule[c.key] ?? '')}" placeholder="${esc(c.placeholder || '')}" aria-label="${esc(c.label)}"></td>`).join('')}`
       + '<td class="t-col-actions">'
-      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="-1" title="Move up" aria-label="Move up">' + MS.icon('arrow-up') + '</button>'
-      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="1" title="Move down" aria-label="Move down">' + MS.icon('arrow-down') + '</button>'
-      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" data-tone="danger" type="button" data-remove title="Remove" aria-label="Remove">' + MS.icon('trash') + '</button></td></tr>';
+      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="-1" data-tip="Move up" aria-label="Move up">' + MS.icon('arrow-up') + '</button>'
+      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-move="1" data-tip="Move down" aria-label="Move down">' + MS.icon('arrow-down') + '</button>'
+      + '<button class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" data-tone="danger" type="button" data-remove data-tip="Remove" aria-label="Remove">' + MS.icon('trash') + '</button></td></tr>';
   }
 
   function renderRules(editor, rules) {
@@ -113,6 +113,7 @@
         case 'rules': renderRules(el, parseRules(raw)); break;
         default: el.value = v;
       }
+      if (el.dataset.kind !== 'bool' && el.dataset.kind !== 'rules') window.Tailor?.sync(el);
       state.baseline[key] = el.dataset.kind === 'rules' ? serializeRules(el).value : readField(el).value;
     });
   }
@@ -206,7 +207,7 @@
       MS.busy(ev.currentTarget, async () => MS.toastResult(await MS.postAction('/api/reconnect'))));
 
     const cap = $('local-timeline-cap');
-    cap.value = String(MS.load('ms.timelineCap', 500));
+    cap.value = String(MS.load('ms.timelineCap', 500)); window.Tailor?.sync(cap);
     cap.addEventListener('change', () => {
       const n = Number(cap.value);
       if (!Number.isInteger(n) || n < 50 || n > 5000) { MS.toast('error', 'Timeline rows must be a whole number between 50 and 5000'); return; }

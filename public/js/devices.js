@@ -65,14 +65,14 @@
       const open = state.expanded.has(k);
       const sel = state.selected && state.selected.key === k;
       const row = `<tr class="device-row" data-key="${esc(k)}" aria-selected="${sel}">`
-        + `<td class="t-col-icon"><span class="t-dot" data-status="${st.status}" title="${st.text}"></span></td>`
+        + `<td class="t-col-icon"><span class="t-dot" data-status="${st.status}" data-tip="${st.text}"></span></td>`
         + `<td><div class="device-label">${esc(d.label || d.id)}</div><div class="device-topic">${esc(d.topic)}</div></td>`
         + `<td class="t-mono">${esc(d.id)}</td>`
         + `<td><span class="t-badge" data-tone="purple">${esc(d.name)}</span></td>`
-        + `<td title="${esc(MS.fmtISO(d.last_seen_ms))}">${esc(MS.fmtRel(d.last_seen_ms))}</td>`
-        + `<td title="${esc(MS.fmtISO(d.since_ms))}">${esc(d.since_ms ? MS.fmtRel(d.since_ms) : '—')}</td>`
-        + `<td class="t-col-icon">${d.stale ? '<span class="t-badge" data-tone="orange" title="Not seen within the rule\'s stale_s">stale</span>' : `<span class="t-badge" data-tone="${d.online ? 'success' : 'danger'}">${st.text}</span>`}</td>`
-        + `<td class="t-col-icon"><button class="t-btn expand-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-expand="${esc(k)}" aria-expanded="${open}" title="Show fields" aria-label="Show fields">${MS.icon('chevron-right')}</button></td>`
+        + `<td data-tip="${esc(MS.fmtISO(d.last_seen_ms))}">${esc(MS.fmtRel(d.last_seen_ms))}</td>`
+        + `<td data-tip="${esc(MS.fmtISO(d.since_ms))}">${esc(d.since_ms ? MS.fmtRel(d.since_ms) : '—')}</td>`
+        + `<td class="t-col-icon">${d.stale ? '<span class="t-badge" data-tone="orange" data-tip="Not seen within the rule\'s stale_s">stale</span>' : `<span class="t-badge" data-tone="${d.online ? 'success' : 'danger'}">${st.text}</span>`}</td>`
+        + `<td class="t-col-icon"><button class="t-btn expand-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-expand="${esc(k)}" aria-expanded="${open}" data-tip="Show fields" aria-label="Show fields">${MS.icon('chevron-right')}</button></td>`
         + '</tr>';
       const fields = open ? `<tr class="fields-row"><td colspan="8">${fieldsHTML(d.fields)}</td></tr>` : '';
       return row + fields;
@@ -126,7 +126,7 @@
     if (!sel) return;
     $('timeline-card').hidden = false;
     $('timeline-title').textContent = `${sel.label} · timeline`;
-    $('timeline-range').value = state.range;
+    $('timeline-range').value = state.range; window.Tailor?.sync($('timeline-range'));
     const to = Date.now();
     const from = to - RANGES[state.range];
     try {
@@ -150,7 +150,7 @@
         el.className = `uptime-seg ${s.kind}`;
         el.style.flexGrow = String(s.to - s.from);
         const label = s.kind === 'on' ? 'online' : s.kind === 'off' ? 'offline' : 'no data';
-        el.title = `${label}: ${MS.fmtISO(s.from)} → ${MS.fmtISO(s.to)} (${MS.fmtDuration((s.to - s.from) / 1000)})`;
+        el.dataset.tip = `${label}: ${MS.fmtISO(s.from)} → ${MS.fmtISO(s.to)} (${MS.fmtDuration((s.to - s.from) / 1000)})`;
         bar.appendChild(el);
       });
       $('timeline-from').textContent = MS.fmtDateTime(from);

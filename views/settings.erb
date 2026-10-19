@@ -103,7 +103,7 @@
           <div class="t-input-group">
 <% if f[:kind] == "secret" -%>
             <input class="t-input" type="password" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="secret" autocomplete="new-password">
-            <button class="t-btn secret-toggle" type="button" data-target="<%= fid %>" title="Show / hide" aria-label="Show / hide"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-eye"/></svg></button>
+            <button class="t-btn secret-toggle" type="button" data-target="<%= fid %>" data-tip="Show / hide" aria-label="Show / hide"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-eye"/></svg></button>
 <% elsif f[:kind] == "gb" -%>
             <input class="t-input" type="number" min="0.1" step="0.1" id="<%= fid %>" data-key="<%= f[:key] %>" data-kind="gb">
 <% elsif f[:kind] == "int" -%>

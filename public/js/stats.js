@@ -60,7 +60,7 @@
   const state = { sys: {}, statsEvents: 0, sparks: new Map(), allOpen: false };
 
   function kv(rows) {
-    return rows.map(([k, v, title]) => `<dt>${esc(k)}</dt><dd${title ? ` title="${esc(title)}"` : ''}>${v}</dd>`).join('');
+    return rows.map(([k, v, title]) => `<dt>${esc(k)}</dt><dd${title ? ` data-tip="${esc(title)}"` : ''}>${v}</dd>`).join('');
   }
 
   // ─── Ingest ─────────────────────────────────────────────
@@ -98,7 +98,7 @@
     const gov = { retention: ['cyan', 'retention governs', 'Age limit is what deletes rows'],
                   size: ['orange', 'size governs', 'Size limit is what deletes rows'],
                   none: ['neutral', 'within limits', 'Neither limit has been reached'] }[db.governing] || ['neutral', db.governing || '—', ''];
-    $('db-governing').innerHTML = `<span class="t-badge" data-tone="${gov[0]}" title="${esc(gov[2])}">${esc(gov[1])}</span>`;
+    $('db-governing').innerHTML = `<span class="t-badge" data-tone="${gov[0]}" data-tip="${esc(gov[2])}">${esc(gov[1])}</span>`;
 
     const rows = [
       ['Messages', esc(MS.fmtNum(db.messages))],

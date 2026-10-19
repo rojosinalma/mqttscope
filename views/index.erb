@@ -22,10 +22,10 @@
       <input id="range-to" type="datetime-local" class="t-input" data-size="sm" data-width="auto" aria-label="To">
       <button id="range-apply" class="t-btn" data-size="sm" type="button">Apply</button>
     </div>
-    <button id="pause-btn" class="t-btn" data-size="sm" type="button" aria-pressed="false" title="Pause live updates">
+    <button id="pause-btn" class="t-btn" data-size="sm" type="button" aria-pressed="false" data-tip="Pause live updates">
       <svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-pause-fill"/></svg><span>Pause</span>
     </button>
-    <button id="publish-btn" class="t-btn" data-variant="primary" data-size="sm" type="button" title="Publish a message" hidden>
+    <button id="publish-btn" class="t-btn" data-variant="primary" data-size="sm" type="button" data-tip="Publish a message" hidden>
       <svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-send"/></svg>Publish
     </button>
   </div>
@@ -38,7 +38,7 @@
         <span class="t-input-addon"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-funnel"/></svg></span>
         <input id="topic-filter" data-hotkey="/" class="t-input" type="search" placeholder="Filter topics: text or glob (+ # *)" aria-label="Filter topics">
       </div>
-      <button id="tree-collapse" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Collapse all" aria-label="Collapse all"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-arrows-collapse"/></svg></button>
+      <button id="tree-collapse" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-tip="Collapse all" aria-label="Collapse all"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-arrows-collapse"/></svg></button>
     </div>
     <div class="pane-sub"><span id="topic-count">Loading topics…</span></div>
     <div id="tree" class="pane-body tree-body"></div>
@@ -65,7 +65,7 @@
           <button class="t-tab" role="tab" type="button" data-tab="chart" id="tab-btn-chart" aria-controls="tab-chart" aria-selected="false" tabindex="-1"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-graph-up"/></svg>Chart</button>
         </div>
       </div>
-      <button id="copy-btn" class="t-btn pane-head-end" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Copy payload" aria-label="Copy payload" hidden><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-clipboard"/></svg></button>
+      <button id="copy-btn" class="t-btn pane-head-end" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-tip="Copy payload" aria-label="Copy payload" hidden><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-clipboard"/></svg></button>
     </div>
     <div id="detail-meta" class="detail-meta" hidden></div>
     <div id="tab-payload" class="pane-body detail-body" role="tabpanel" aria-labelledby="tab-btn-payload"></div>
@@ -73,7 +73,7 @@
     <div id="tab-chart" class="pane-body detail-body" role="tabpanel" aria-labelledby="tab-btn-chart" hidden>
       <div class="chart-controls">
         <select id="chart-path" class="t-select" data-size="sm" data-width="auto" aria-label="Numeric path"></select>
-        <button id="chart-reload" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" title="Reload series" aria-label="Reload series"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-arrow-clockwise"/></svg></button>
+        <button id="chart-reload" class="t-btn" data-variant="ghost" data-size="sm" data-icon="only" type="button" data-tip="Reload series" aria-label="Reload series"><svg class="t-icon" aria-hidden="true"><use href="/tailor/icons.svg#bi-arrow-clockwise"/></svg></button>
       </div>
       <div id="chart-empty" hidden></div>
       <div id="chart-box" class="chart-box"></div>

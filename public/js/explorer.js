@@ -210,14 +210,14 @@
 
   function leafBadges(e) {
     let html = '';
-    if (e.retained) html += '<span class="t-badge" data-size="xs" data-tone="purple" title="Last message was retained">retained</span>';
-    if (e.rate > 0.0005) html += `<span class="t-badge" data-size="xs" data-tone="cyan" title="Messages per second over the rate window">${esc(MS.fmtRate(e.rate))}</span>`;
+    if (e.retained) html += '<span class="t-badge" data-size="xs" data-tone="purple" data-tip="Last message was retained">retained</span>';
+    if (e.rate > 0.0005) html += `<span class="t-badge" data-size="xs" data-tone="cyan" data-tip="Messages per second over the rate window">${esc(MS.fmtRate(e.rate))}</span>`;
     return html;
   }
 
   function badgesHTML(node) {
     let html = '';
-    if (node.children.size && !(S.filter || isOpen(node))) html += `<span class="tree-count" title="Topics below">${MS.fmtNum(node.count)}</span>`;
+    if (node.children.size && !(S.filter || isOpen(node))) html += `<span class="tree-count" data-tip="Topics below">${MS.fmtNum(node.count)}</span>`;
     if (node.entry) html += leafBadges(node.entry);
     return html;
   }
@@ -256,7 +256,7 @@
       if (node.path === '$SYS' || node.path.startsWith('$SYS/')) cls.push('is-sys');
       if (e && S.selected === node.path) cls.push('selected');
       const name = node.name === '' ? '(empty)' : node.name;
-      let html = `<div class="${cls.join(' ')}" data-path="${esc(node.path)}"${e ? ` data-topic="${esc(node.path)}"` : ''} title="${esc(node.path)}">`
+      let html = `<div class="${cls.join(' ')}" data-path="${esc(node.path)}"${e ? ` data-topic="${esc(node.path)}"` : ''} data-tip="${esc(node.path)}">`
         + `${MS.icon('chevron-right', `tree-toggle${kids ? (open ? ' open' : '') : ' leaf'}`)}`
         + `<span class="tree-name">${highlightName(name, needle)}</span>`
         + `${e && e.preview !== null ? `<span class="tree-value">= ${esc(e.preview)}</span>` : ''}`
@@ -327,17 +327,17 @@
   function rowBadges(m) {
     let b = '';
     if (m.retained) b += '<span class="t-badge" data-size="xs" data-tone="purple">retained</span>';
-    if (m.origin === 'ui') b += '<span class="t-badge" data-size="xs" data-tone="pink" title="Published from mqttscope">ui</span>';
-    if (m.dup_count > 0) b += `<span class="t-badge" data-size="xs" data-tone="orange" title="Received> ${m.dup_count + 1} times; ${m.dup_count} identical repeats folded into this row">×${m.dup_count + 1}</span>`;
-    if (!m.stored) b += '<span class="t-badge" data-size="xs" data-tone="neutral" title="Seen live but not stored (sampling or dedup)">not stored</span>';
-    if (m.truncated) b += '<span class="t-badge" data-size="xs" data-tone="yellow" title="Stored truncated to max_payload_bytes">truncated</span>';
+    if (m.origin === 'ui') b += '<span class="t-badge" data-size="xs" data-tone="pink" data-tip="Published from mqttscope">ui</span>';
+    if (m.dup_count > 0) b += `<span class="t-badge" data-size="xs" data-tone="orange" data-tip="Received> ${m.dup_count + 1} times; ${m.dup_count} identical repeats folded into this row">×${m.dup_count + 1}</span>`;
+    if (!m.stored) b += '<span class="t-badge" data-size="xs" data-tone="neutral" data-tip="Seen live but not stored (sampling or dedup)">not stored</span>';
+    if (m.truncated) b += '<span class="t-badge" data-size="xs" data-tone="yellow" data-tip="Stored truncated to max_payload_bytes">truncated</span>';
     return b;
   }
 
   function rowHTML(m, fresh) {
     const day = MS.isToday(m.ts_ms) ? '' : `<span class="tl-date">${MS.fmtDay(m.ts_ms)} </span>`;
     const sel = S.selectedMsg && S.selectedMsg.key === m.key ? ' selected' : '';
-    return `<div class="tl-row${sel}${fresh ? ' fresh' : ''}" data-key="${m.key}" title="${esc(MS.fmtISO(m.ts_ms))}">`
+    return `<div class="tl-row${sel}${fresh ? ' fresh' : ''}" data-key="${m.key}" data-tip="${esc(MS.fmtISO(m.ts_ms))}">`
       + `<span class="tl-time">${day}${MS.fmtClock(m.ts_ms)}</span>`
       + `<span class="tl-size">${MS.fmtBytes(m.size)}</span>`
       + `<span class="tl-preview">${esc(shortPreview(m))}</span>`
@@ -374,10 +374,10 @@
     const e = S.topics.get(S.selected);
     const bits = [];
     if (e) {
-      bits.push(`<span title="Messages received since mqttscope started tracking it">${MS.fmtNum(e.count)} received</span>`);
+      bits.push(`<span data-tip="Messages received since mqttscope started tracking it">${MS.fmtNum(e.count)} received</span>`);
       if (e.stored !== null && e.stored !== undefined) bits.push(`<span>${MS.fmtNum(e.stored)} stored</span>`);
       bits.push(`<span>${esc(MS.fmtRate(e.rate))}</span>`);
-      if (e.last_seen_ms) bits.push(`<span title="${esc(MS.fmtISO(e.last_seen_ms))}">last ${esc(MS.fmtRel(e.last_seen_ms))}</span>`);
+      if (e.last_seen_ms) bits.push(`<span data-tip="${esc(MS.fmtISO(e.last_seen_ms))}">last ${esc(MS.fmtRel(e.last_seen_ms))}</span>`);
       if (e.retained) bits.push('<span class="t-badge" data-size="xs" data-tone="purple">retained</span>');
     }
     meta.innerHTML = bits.join('');
@@ -554,7 +554,7 @@
     if (!m) { box.hidden = true; box.innerHTML = ''; return; }
     box.hidden = false;
     const bits = [
-      `<span class="meta-time" title="${esc(MS.fmtISO(m.ts_ms))}">${MS.isToday(m.ts_ms) ? '' : `${MS.fmtDay(m.ts_ms)} `}${MS.fmtClock(m.ts_ms)}</span>`,
+      `<span class="meta-time" data-tip="${esc(MS.fmtISO(m.ts_ms))}">${MS.isToday(m.ts_ms) ? '' : `${MS.fmtDay(m.ts_ms)} `}${MS.fmtClock(m.ts_ms)}</span>`,
       `<span>${MS.fmtBytes(m.size)}</span>`,
       `<span>QoS ${esc(m.qos)}</span>`,
       m.id !== null ? `<span class="t-mono">#${esc(m.id)}</span>` : '',
@@ -687,6 +687,7 @@
     sel.innerHTML = S.chartPaths.map((p) => `<option value="${esc(p)}">${esc(p === '' ? '(value)' : p)}</option>`).join('');
     const remembered = S.chartPathByTopic[topic];
     if (remembered !== undefined && S.chartPaths.includes(remembered)) sel.value = remembered;
+    window.Tailor?.sync(sel);
     sel.disabled = !S.chartPaths.length;
   }
 
@@ -816,7 +817,7 @@
     const m = S.selectedMsg;
     $('pub-payload').value = m && !m.binary && m.topic === S.selected ? (m.payload || '') : '';
     $('pub-retain').checked = false;
-    $('pub-qos').value = '0';
+    $('pub-qos').value = '0'; window.Tailor?.sync($('pub-qos'));
     resetPublishConfirm();
     payloadHint();
     const dlg = $('publish-modal');
@@ -883,7 +884,7 @@
       results.innerHTML = list.map((r, i) => `<button type="button" class="search-result" data-i="${i}">`
         + `<div class="search-result-head"><span class="search-result-topic">${esc(r.topic)}</span>`
         + `<span class="tl-size">${MS.fmtBytes(r.size)}</span>`
-        + `<span class="search-result-time" title="${esc(MS.fmtISO(r.ts_ms))}">${esc(MS.fmtDateTime(r.ts_ms))}</span></div>`
+        + `<span class="search-result-time" data-tip="${esc(MS.fmtISO(r.ts_ms))}">${esc(MS.fmtDateTime(r.ts_ms))}</span></div>`
         + `<div class="search-snippet">${markTerms(r.snippet ?? '', q)}</div></button>`).join('');
       results.querySelectorAll('.search-result').forEach((el) => el.addEventListener('click', () => {
         const r = list[Number(el.dataset.i)];
@@ -915,7 +916,7 @@
     btn.setAttribute('aria-pressed', S.paused);
     if (S.paused) btn.dataset.tone = 'warning'; else delete btn.dataset.tone;
     btn.innerHTML = S.paused ? MS.icon('play-fill') + '<span>Resume</span>' : MS.icon('pause-fill') + '<span>Pause</span>';
-    btn.title = S.paused ? 'Resume live updates' : 'Pause live updates';
+    btn.dataset.tip = S.paused ? 'Resume live updates' : 'Pause live updates';
     if (!S.paused && S.missed) loadHistory({ keepSelection: true });
     S.missed = 0;
     renderTimelineStatus();
@@ -1038,13 +1039,13 @@
 
     const range = $('range');
     if (!RANGES[S.range]) S.range = '1h';
-    range.value = S.range;
+    range.value = S.range; window.Tailor?.sync(range);
     range.addEventListener('change', () => {
       if (range.value === 'custom') {
         $('custom-range').hidden = false;
         const b = bounds();
-        $('range-from').value = toLocalInput(b.from_ms);
-        $('range-to').value = toLocalInput(Date.now());
+        $('range-from').value = toLocalInput(b.from_ms); window.Tailor?.sync($('range-from'));
+        $('range-to').value = toLocalInput(Date.now()); window.Tailor?.sync($('range-to'));
         return;
       }
       S.range = range.value;
